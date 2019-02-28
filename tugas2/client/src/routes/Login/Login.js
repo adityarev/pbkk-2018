@@ -107,10 +107,6 @@ class Login extends React.Component {
               <Input name="password" type="password" id="password" autoComplete="current-password"
                 onChange={this.handleOnChange} />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <Button
               type="submit"
               fullWidth
