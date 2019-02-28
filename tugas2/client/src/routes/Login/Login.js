@@ -50,6 +50,39 @@ class Login extends React.Component {
     classes: PropTypes.object.isRequired,
   };
 
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      savedForm: {
+        username: '',
+        password: ''
+      },
+      isSubmitting: false
+    }
+  }
+
+  handleOnChange = (event) => {
+    const { name, value } = event.target
+
+    this.setState({
+      ...this.state,
+      savedForm: {
+        ...this.state.savedForm,
+        [name]: value
+      }
+    })
+  }
+
+  handleOnSubmit = (event) => {
+    event.preventDefault()
+    
+    this.setState({
+      ...this.state,
+      isSubmitting: !this.state.isSubmitting
+    })
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -63,14 +96,16 @@ class Login extends React.Component {
           <Typography component="h1" variant="h5">
             Login
           </Typography>
-          <form className={classes.form}>
+          <form className={classes.form} onSubmit={this.handleOnSubmit} /*method="POST"*/ >
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="username">Username</InputLabel>
-              <Input id="username" name="username" autoComplete="username" autoFocus />
+              <Input id="username" name="username" autoComplete="username" autoFocus
+                onChange={this.handleOnChange} />
             </FormControl>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">Password</InputLabel>
-              <Input name="password" type="password" id="password" autoComplete="current-password" />
+              <Input name="password" type="password" id="password" autoComplete="current-password"
+                onChange={this.handleOnChange} />
             </FormControl>
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -82,6 +117,7 @@ class Login extends React.Component {
               variant="contained"
               color="primary"
               className={classes.submit}
+              disabled={this.state.isSubmitting}
             >
               Login
             </Button>
