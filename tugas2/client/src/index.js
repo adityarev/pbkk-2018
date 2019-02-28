@@ -1,11 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import './index.css';
 import App from './routes/App/App';
+import Home from './routes/Home/Home';
+import Login from './routes/Login/Login';
+import Register from './routes/Register/Register'
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-  <App />,
+  <Router>
+    <Switch>
+      <Route exact path="/" component={App} />
+      <Route path="/home" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+    </Switch>
+  </Router>,
   document.getElementById('root')
 );
 
