@@ -11,6 +11,8 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 import StyledComponent from '../../styledComponents/base'
+import SnackbarContent from '../../components/Snackbar/SnackbarContent'
+import { Offline } from 'react-detect-offline'
 
 class Register extends React.Component {
   static propTypes = {
@@ -47,7 +49,7 @@ class Register extends React.Component {
     
     this.setState({
       ...this.state,
-      isSubmitting: !this.state.isSubmitting
+      isSubmitting: true
     })
   }
 
@@ -58,6 +60,11 @@ class Register extends React.Component {
       <main className={classes.main}>
         <CssBaseline />
         <Paper className={classes.paper}>
+          <Offline>
+            <SnackbarContent
+              variant="error"
+              message="You're offline!" />
+          </Offline>
           <Avatar className={classes.avatar}>
             <AccountCircle />
           </Avatar>

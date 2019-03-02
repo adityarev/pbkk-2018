@@ -11,6 +11,8 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 import StyledComponent from '../../styledComponents/base'
+import SnackbarContent from '../../components/Snackbar/SnackbarContent'
+import { Offline } from 'react-detect-offline'
 
 class Login extends React.Component {
   static propTypes = {
@@ -46,8 +48,12 @@ class Login extends React.Component {
     
     this.setState({
       ...this.state,
-      isSubmitting: !this.state.isSubmitting
+      isSubmitting: true
     })
+  }
+
+  handleToRegister = (event) => {
+    this.props.history.push('/register');
   }
 
   render() {
@@ -57,6 +63,11 @@ class Login extends React.Component {
       <main className={classes.main}>
         <CssBaseline />
         <Paper className={classes.paper}>
+          <Offline>
+            <SnackbarContent
+              variant="error"
+              message="You're offline!" />
+          </Offline>
           <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
           </Avatar>
@@ -83,6 +94,15 @@ class Login extends React.Component {
               disabled={this.state.isSubmitting}
             >
               Login
+            </Button>
+            <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                className={classes.submit}
+                onClick={this.handleToRegister}
+            >
+              Register
             </Button>
           </form>
         </Paper>
