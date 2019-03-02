@@ -1,5 +1,5 @@
 import express from 'express'
-import * as User from './queries/user'
+import * as User from './api/user'
 
 const app = express()
 const PORT = 5000
