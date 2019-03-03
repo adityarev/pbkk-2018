@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
@@ -12,9 +12,13 @@ import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 import StyledComponent from '../../styledComponents/base'
 import SnackbarContent from '../../components/Snackbar/SnackbarContent'
-import { Offline } from 'react-detect-offline'
+import SnackbarPopUp from '../../components/Snackbar/SnackbarPopUp'
 
-class Register extends React.Component {
+import { Offline, Detector } from 'react-detect-offline'
+import { Redirect } from 'react-router-dom'
+import axios from 'axios'
+
+class Register extends Component {
   static propTypes = {
     classes: PropTypes.object.isRequired,
   }
@@ -28,7 +32,10 @@ class Register extends React.Component {
         password: '',
         retype: ''
       },
-      isSubmitting: false
+      errorMessage: '',
+      isSubmitting: false,
+      showError: false,
+      shouldRedirect: false
     }
   }
 
@@ -50,56 +57,124 @@ class Register extends React.Component {
     this.setState({
       ...this.state,
       isSubmitting: true
+    }, async () => {
+      const { savedForm } = this.state
+      if (savedForm.password !== savedForm.retype) {
+        console.log('Password not match')
+        this.setState({
+          ...this.state,
+          isSubmitting: false,
+          showError: true,
+          errorMessage: 'Password doesn\'t match!'
+        })
+      } else {
+        let form = {}
+        form.username = savedForm.username
+        form.password = savedForm.password
+        
+        await axios.post(`http://localhost:5000/api/auth/register`, { ...form })
+        .then(res => {
+          if (res.status === 200) {
+            this.handleRegisterSuccess()
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      }
     })
+
+    this.setState({
+      ...this.state,
+      isSubmitting: false,
+      showError: true,
+      errorMessage: 'Username already exist'
+    })
+  }
+
+  handleRegisterSuccess = () => {
+    this.setState({
+      ...this.state,
+      shouldRedirect: true
+    })
+  }
+
+  handleSnackbarClose = (event) => {
+    this.setState({
+      ...this.state,
+      showError: false
+    })
+  }
+
+  renderError() {
+    return (
+      <SnackbarPopUp 
+        variant="error"
+        message={this.state.errorMessage}
+        onClose={this.handleSnackbarClose} />
+    )
+  }
+
+  renderRedirect() {
+    console.log('redirect to login...')
+    return <Redirect push to="/login" />
   }
 
   render() {
     const { classes } = this.props
 
     return (
-      <main className={classes.main}>
-        <CssBaseline />
-        <Paper className={classes.paper}>
-          <Offline>
-            <SnackbarContent
-              variant="error"
-              message="You're offline!" />
-          </Offline>
-          <Avatar className={classes.avatar}>
-            <AccountCircle />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Register
-          </Typography>
-          <form className={classes.form} onSubmit={this.handleOnSubmit} /*method="POST"*/ >
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="username">Username</InputLabel>
-              <Input id="username" name="username" autoComplete="username" autoFocus
-                onChange={this.handleOnChange} />
-            </FormControl>
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="password">Password</InputLabel>
-              <Input name="password" type="password" id="password" autoComplete="current-password"
-                onChange={this.handleOnChange} />
-            </FormControl>
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="retype">Retype Password</InputLabel>
-              <Input name="retype" type="password" id="retype" autoComplete="retype-password"
-                onChange={this.handleOnChange} />
-            </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-              disabled={this.state.isSubmitting}
-            >
+      <Fragment>
+        {this.state.shouldRedirect && this.renderRedirect()}
+        <main className={classes.main}>
+          <CssBaseline />
+          <Paper className={classes.paper}>
+            <Offline>
+              <SnackbarContent
+                variant="warning"
+                message="You're offline!" />
+            </Offline>
+            <Avatar className={classes.avatar}>
+              <AccountCircle />
+            </Avatar>
+            <Typography component="h1" variant="h5">
               Register
-            </Button>
-          </form>
-        </Paper>
-      </main>
+            </Typography>
+            <form className={classes.form} onSubmit={this.handleOnSubmit} /*method="POST"*/ >
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="username">Username</InputLabel>
+                <Input id="username" name="username" autoComplete="username" autoFocus
+                  onChange={this.handleOnChange} />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="password">Password</InputLabel>
+                <Input name="password" type="password" id="password" autoComplete="current-password"
+                  onChange={this.handleOnChange} />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="retype">Retype Password</InputLabel>
+                <Input name="retype" type="password" id="retype" autoComplete="retype-password"
+                  onChange={this.handleOnChange} />
+              </FormControl>
+              <Detector
+                render={({ online }) => (
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    disabled={this.state.isSubmitting || !online}
+                  >
+                    Register
+                  </Button>
+                )}
+              />
+            </form>
+          </Paper>
+        </main>
+        {this.state.showError && this.renderError()}
+      </Fragment>
     )
   }
 }

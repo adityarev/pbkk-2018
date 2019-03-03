@@ -54,7 +54,11 @@ class SnackbarPopUp extends React.Component {
       return
     }
 
-    this.setState({ open: false })
+    this.setState({ open: false }, () => {
+      if (this.props.onClose) {
+        this.props.onClose()
+      }
+    })
   }
 
   render() {
@@ -70,8 +74,8 @@ class SnackbarPopUp extends React.Component {
         >
           <SnackbarContent
             onClose={this.handleClose}
-            variant="success"
-            message="This is a success message!"
+            variant={this.props.variant || 'info'}
+            message={this.props.message || 'Info'}
           />
         </Snackbar>
     )
