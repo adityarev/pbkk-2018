@@ -53,7 +53,7 @@ class Register extends Component {
     })
   }
 
-  handleOnSubmit = async (event) => {
+  handleOnSubmit = (event) => {
     event.preventDefault()
     
     const { savedForm } = this.state
@@ -72,7 +72,7 @@ class Register extends Component {
       form.username = savedForm.username
       form.password = savedForm.password
       
-      await axios.post(`http://localhost:5000/api/auth/register`, { ...form })
+      axios.post(`http://localhost:5000/api/auth/register`, { ...form })
       .then(res => {
         if (res.status === 200) {
           this.handleRegisterSuccess()
