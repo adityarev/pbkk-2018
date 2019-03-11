@@ -65,9 +65,27 @@ class Login extends Component {
           this.handleLoginSuccess(savedForm.username)
         }
       })
-      .catch(err => {
-        this.handleLoginFailed()
-        console.log(err)
+      .catch(error => {
+        // Error
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          // console.log(error.response.data);
+          // console.log(error.response.status);
+          // console.log(error.response.headers);
+          console.log('Error response')
+          this.handleLoginFailed('Username already exist!')
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log('Error request')
+          this.handleLoginFailed('Server doesn\'t give any response!')
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message)
+        }
+        console.log(error.config)
       })
   }
 
@@ -80,14 +98,13 @@ class Login extends Component {
     })
   }
 
-  handleLoginFailed = () => {
-    console.log('Masuk kesini gan')
+  handleLoginFailed = (message) => {
     this.setState({
       ...this.state,
       snackbar: {
         isActive: true,
-        message: "Wrong username or password!",
-        variant: "error"
+        message: message,
+        variant: 'error'
       }
     })
   }
