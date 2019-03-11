@@ -34,7 +34,11 @@ class Login extends Component {
         username: '',
         password: ''
       },
-      showError: false,
+      snackbar: {
+        isActive: false,
+        message: "",
+        variant: ""
+      },
       shouldRedirect: false
     }
   }
@@ -61,10 +65,10 @@ class Login extends Component {
           this.handleLoginSuccess(savedForm.username)
         }
       })
-    
-    if (!this.state.shouldRedirect) {
-      this.handleLoginFailed()
-    }
+      .catch(err => {
+        this.handleLoginFailed()
+        console.log(err)
+      })
   }
 
   handleLoginSuccess = (username) => {
@@ -80,7 +84,11 @@ class Login extends Component {
     console.log('Masuk kesini gan')
     this.setState({
       ...this.state,
-      showError: true
+      snackbar: {
+        isActive: true,
+        message: "Wrong username or password!",
+        variant: "error"
+      }
     })
   }
 
@@ -91,15 +99,19 @@ class Login extends Component {
   handleSnackbarClose = (event) => {
     this.setState({
       ...this.state,
-      showError: false
+      snackbar: {
+        isActive: false,
+        message: "",
+        variant: ""
+      }
     })
   }
 
-  renderError() {
+  renderSnackbar = () => {
     return (
       <SnackbarPopUp
-        variant="error"
-        message="Wrong username or password!"
+        variant={this.state.snackbar.variant}
+        message={this.state.snackbar.message}
         onClose={this.handleSnackbarClose} />
     )
   }
@@ -128,7 +140,7 @@ class Login extends Component {
             <Typography component="h1" variant="h5">
               Login
             </Typography>
-            <form className={classes.form} onSubmit={this.handleOnSubmit} /*method="POST"*/ >
+            <form className={classes.form} onSubmit={this.handleOnSubmit}>
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="username">Username</InputLabel>
                 <Input id="username" name="username" autoComplete="username" autoFocus
@@ -165,7 +177,7 @@ class Login extends Component {
             </form>
           </Paper>
         </main>
-        {this.state.showError && this.renderError()}
+        {this.state.snackbar.isActive && this.renderSnackbar()}
       </Fragment>
     )
   }

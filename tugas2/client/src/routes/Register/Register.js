@@ -32,9 +32,11 @@ class Register extends Component {
         password: '',
         retype: ''
       },
-      errorMessage: '',
-      isSubmitting: false,
-      showError: false,
+      snackbar: {
+        isActive: false,
+        message: '',
+        variant: ''
+      },
       shouldRedirect: false
     }
   }
@@ -51,66 +53,95 @@ class Register extends Component {
     })
   }
 
-  handleOnSubmit = (event) => {
+  handleOnSubmit = async (event) => {
     event.preventDefault()
     
-    this.setState({
-      ...this.state,
-      isSubmitting: true
-    }, async () => {
-      const { savedForm } = this.state
-      if (savedForm.password !== savedForm.retype) {
-        console.log('Password not match')
-        this.setState({
-          ...this.state,
-          isSubmitting: false,
-          showError: true,
-          errorMessage: 'Password doesn\'t match!'
-        })
-      } else {
-        let form = {}
-        form.username = savedForm.username
-        form.password = savedForm.password
-        
-        await axios.post(`http://localhost:5000/api/auth/register`, { ...form })
-        .then(res => {
-          if (res.status === 200) {
-            this.handleRegisterSuccess()
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      }
-    })
-
-    this.setState({
-      ...this.state,
-      isSubmitting: false,
-      showError: true,
-      errorMessage: 'Username already exist'
-    })
+    const { savedForm } = this.state
+    if (savedForm.password !== savedForm.retype) {
+      console.log('Password not match')
+      this.setState({
+        ...this.state,
+        snackbar: {
+          isActive: true,
+          message: 'Password doesn\'t match!',
+          variant: 'error'
+        }
+      })
+    } else {
+      let form = {}
+      form.username = savedForm.username
+      form.password = savedForm.password
+      
+      await axios.post(`http://localhost:5000/api/auth/register`, { ...form })
+      .then(res => {
+        if (res.status === 200) {
+          this.handleRegisterSuccess()
+        }
+      })
+      .catch(error => {
+        // Error
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          // console.log(error.response.data);
+          // console.log(error.response.status);
+          // console.log(error.response.headers);
+          console.log('Error response')
+          this.handleRegisterFailed('Username already exist!')
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log('Error request')
+          this.handleRegisterFailed('Server doesn\'t give any response!')
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+      console.log(error.config);
+      })
+    }
   }
 
   handleRegisterSuccess = () => {
     this.setState({
       ...this.state,
-      shouldRedirect: true
+      shouldRedirect: true,
+      snackbar: {
+        isActive: true,
+        message: 'User registered!',
+        variant: 'success'
+      }
+    })
+  }
+
+  handleRegisterFailed = (message) => {
+    this.setState({
+      ...this.state,
+      snackbar: {
+        isActive: true,
+        message: message,
+        variant: 'error'
+      }
     })
   }
 
   handleSnackbarClose = (event) => {
     this.setState({
       ...this.state,
-      showError: false
+      snackbar: {
+        isActive: false,
+        message: '',
+        variant: ''
+      }
     })
   }
 
-  renderError() {
+  renderSnackbar = () => {
     return (
       <SnackbarPopUp 
-        variant="error"
-        message={this.state.errorMessage}
+        variant={this.state.snackbar.variant}
+        message={this.state.snackbar.message}
         onClose={this.handleSnackbarClose} />
     )
   }
@@ -164,7 +195,7 @@ class Register extends Component {
                     variant="contained"
                     color="primary"
                     className={classes.submit}
-                    disabled={this.state.isSubmitting || !online}
+                    disabled={!online}
                   >
                     Register
                   </Button>
@@ -173,7 +204,7 @@ class Register extends Component {
             </form>
           </Paper>
         </main>
-        {this.state.showError && this.renderError()}
+        {this.state.snackbar.isActive && this.renderSnackbar()}
       </Fragment>
     )
   }
