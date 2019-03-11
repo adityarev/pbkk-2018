@@ -1,6 +1,6 @@
 import { Pool } from 'pg'
 
-const pool = new Pool({
+export const pool = new Pool({
   user: 'pbkk',
   host: 'localhost',
   database: 'pbkk',
@@ -8,4 +8,10 @@ const pool = new Pool({
   port: 5432,
 })
 
-export default pool
+export const poolRemote = new Pool({
+  user: 'pbkk',
+  host: 'rsmbyk.com',
+  database: 'pbkk',
+  password: 'nuzulcarrykita',
+  port: 5432,
+})

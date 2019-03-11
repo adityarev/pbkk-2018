@@ -9,10 +9,12 @@ import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 import StyledComponent from '../../styledComponents/base'
 import SnackbarContent from '../../components/Snackbar/SnackbarContent'
+import SnackbarPopUp from '../../components/Snackbar/SnackbarPopUp'
 
 import { Offline, Detector } from 'react-detect-offline'
 import { Redirect } from 'react-router-dom'
 import Cookies from 'universal-cookie'
+import axios from 'axios'
 
 const cookies = new Cookies()
 
@@ -25,18 +27,81 @@ class Home extends Component {
     super(props)
 
     this.state = {
-      isLoggingOut: false
+      snackbar: {
+        isActive: false,
+        message: '',
+        variant: ''
+      }
     }
   }
 
-  handleLogout = (event) => {
+  handleLogoutClick = (event) => {
+    axios.post(`http://localhost:5000/api/auth/logout`, {
+      username: cookies.get('username')
+    })
+      .then(res => {
+        if (res.status === 200) {
+          this.handleLogoutSuccess()
+        }
+      })
+      .catch(error => {
+        // Error
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          // console.log(error.response.data);
+          // console.log(error.response.status);
+          // console.log(error.response.headers);
+          console.log('Error response')
+          this.handleLogoutFailed('Wrong request!')
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log('Error request')
+          this.handleLogoutFailed('Server doesn\'t give any response!')
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message)
+        }
+        console.log(error.config)
+      })
+  }
+
+  handleLogoutSuccess = () => {
+    cookies.remove('username')
+    this.props.history.push('/login');
+  }
+
+  handleLogoutFailed = (message) => {
     this.setState({
       ...this.state,
-      isLoggingOut: true
-    }, () => {
-      cookies.remove('username')
-      this.props.history.push('/login');
+      snackbar: {
+        isActive: true,
+        message: message,
+        variant: 'error'
+      }
     })
+  }
+
+  handleSnackbarClose = (event) => {
+    this.setState({
+      ...this.state,
+      snackbar: {
+        isActive: false,
+        message: "",
+        variant: ""
+      }
+    })
+  }
+
+  renderSnackbar = () => {
+    return (
+      <SnackbarPopUp
+        variant={this.state.snackbar.variant}
+        message={this.state.snackbar.message}
+        onClose={this.handleSnackbarClose} />
+    )
   }
 
   renderRedirect() {
@@ -70,7 +135,7 @@ class Home extends Component {
                   variant="contained"
                   color="default"
                   className={classes.submit}
-                  onClick={this.handleLogout}
+                  onClick={this.handleLogoutClick}
                   disabled={this.state.isLoggingOut || !online}
                 >
                   Logout
@@ -79,6 +144,7 @@ class Home extends Component {
             />
           </Paper>
         </main>
+        {this.state.snackbar.isActive && this.renderSnackbar()}
       </Fragment>
     )
   }

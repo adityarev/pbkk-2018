@@ -26,6 +26,7 @@ app.use(function(req, res, next) {
 
 app.post('/api/auth/login', User.login)
 app.post('/api/auth/register', User.register)
+app.post('/api/auth/logout', User.logout)
 
 app.get('/api/users', User.getUsers)
 app.get('/api/users/:id', User.getUserById)

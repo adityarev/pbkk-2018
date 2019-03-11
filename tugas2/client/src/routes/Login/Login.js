@@ -74,7 +74,7 @@ class Login extends Component {
           // console.log(error.response.status);
           // console.log(error.response.headers);
           console.log('Error response')
-          this.handleLoginFailed('Username already exist!')
+          this.handleLoginFailed('Wrong username or password!')
         } else if (error.request) {
           // The request was made but no response was received
           // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
