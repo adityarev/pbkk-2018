@@ -15,15 +15,10 @@ const executePool = (response) => {
                 }
             }
 
-            // console.log(results)
-            
             if (noResponse) {
-                // console.log('Err noResponse')
                 finalResults = results.rows
                 return
             }
-
-            // console.log('apapun')
 
             if (results.rows.length == 0 && results.command !== 'INSERT') {
                 response.status(400).json({'result': emptyResponse})
@@ -46,7 +41,6 @@ export const login = (req, res) => {
     const params = [username, password]
 
     const rows = executePool(res)(pool, query, params, true, 'Success', 'Invalid username and/or password')
-    console.log(rows)
 
     if (rows.length == 0) {
         res.status(400).json({'result': 'Invalid username and/or password'})
