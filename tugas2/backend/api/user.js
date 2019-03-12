@@ -1,36 +1,21 @@
 import { pool, poolRemote } from './init'
 
 
-const executePool = (response) => {
-    const decorator = async (conn, query, data, noResponse, validResponse, emptyResponse, errorResponse) => {
-        let finalResults = undefined
-        
-        await conn.query(query, data, (err, results) => {
-            if (err) {
-                if (errorResponse) {
-                    response.status(400).json({'result': errorResponse})
-                    return
-                } else {
-                    throw err
-                }
-            }
+const errorResponse = (response, message) => {
+    response.status(400).json({'result': message})
+}
 
-            if (noResponse) {
-                finalResults = results.rows
-                return
-            }
+const successResponse = (response, message) => {
+    if (message === null)
+	message = 'Success'
+    response.status(200).json({'result': message})
+}
 
-            if (results.rows.length == 0 && results.command !== 'INSERT') {
-                response.status(400).json({'result': emptyResponse})
-            } else {
-                response.status(200).json({'result': validResponse || results.rows})
-            }
-        })
-
-        return finalResults
-    }
-
-    return decorator
+const assertNotEmpty = results => {
+    if (results.rows.length == 0)
+	throw "empty results"
+    else
+	return results
 }
 
 export const login = (req, res) => {
@@ -39,19 +24,17 @@ export const login = (req, res) => {
 
     const query = 'SELECT * FROM public.users WHERE username = $1 AND password = $2'
     const params = [username, password]
-
-    const rows = executePool(res)(pool, query, params, true, 'Success', 'Invalid username and/or password')
-
-    if (rows.length == 0) {
-        res.status(400).json({'result': 'Invalid username and/or password'})
-    } else {
-        const text = `${username} logged in`
-
-        executePool(res)(pool, `INSERT INTO public.logs (text) VALUES ('${text}')`, [], true)
-        executePool(res)(poolRemote, `INSERT INTO public.logs (text) VALUES ('${text}')`, [], true)
-
-        res.status(200).json({'result': 'Success'})
-    }
+    
+    pool.query(query, params)
+	.catch(console.log)
+	.then(assertNotEmpty)
+	.then(_ => {
+        	const logQuery = `INSERT INTO public.logs (text) VALUES ('${username} logged in')`
+		poolRemote.query(logQuery, [])
+		pool.query(logQuery, [])
+		successResponse(res)
+	})
+	.catch(_ => errorResponse(res, 'Invalid username and/or password'))
 }
 
 export const register = (req, res) => {
@@ -59,28 +42,32 @@ export const register = (req, res) => {
     const password = req.body.password
     const query = 'INSERT INTO public.users (username, password) VALUES ($1, $2)'
     const params = [username, password]
-    executePool(res)(poolRemote, query, params, false, null, 'Success', 'Username already exists')
+    poolRemote.query(query, params)
+	      .then(assertNotEmpty)
+	      .then(_ => errorResponse(res, 'Username already exists'))
+	      .catch(_ => successResponse(res))
 }
 
 export const logout = (req, res) => {
     const username = req.body.username
-
-    const text = `${username} signed out`
-
-    executePool(res)(pool, `INSERT INTO public.logs (text) VALUES ('${text}')`, [], true)
-    executePool(res)(poolRemote, `INSERT INTO public.logs (text) VALUES ('${text}')`, [], true)
-    
-    res.status(200).json({'result': 'Success'})
+    const logQuery = `INSERT INTO public.logs (text) VALUES ('${username} signed out')`
+    poolRemote.query(logQuery, [])
+    pool.query(logQuery, [])
+    successResponse(res)
 }
 
 export const getUsers = (req, res) => {
     const query = 'SELECT * FROM public.users'
-    executePool(res)(pool, query, [])
+    pool.query(query, [])
+	.then(users => successResponse(res, users.rows))
+	.catch(console.log)
 }
 
 export const getUserById = (req, res) => {
     const id = parseInt(req.params.id)
     const query = 'SELECT * FROM public.users WHERE id = $1'
     const params = [id]
-    executePool(res)(pool, query, params)
+    pool.query(query, params)
+	.then(user => successResponse(res, user.rows))
+	.catch(console.log)
 }
