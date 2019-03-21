@@ -1,0 +1,24 @@
+version: '3'
+services:
+  master:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: pbkk
+      POSTGRES_PASSWORD: nuzulcarrykita
+    ports:
+      - 15432:5432
+    volumes:
+      - ./schema-master.sql:/docker-entrypoint-initdb.d/init.sql
+  slave:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: pbkk
+      POSTGRES_PASSWORD: nuzulcarrykita
+    depends_on:
+      - master
+    ports:
+      - 5432:5432
+    volumes:
+      - ./schema-client.sql:/docker-entrypoint-initdb.d/init.sql

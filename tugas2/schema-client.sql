@@ -17,12 +17,14 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER SYSTEM SET wal_level = logical;
+
 --
 -- TOC entry 2825 (class 1262 OID 16521)
 -- Name: pbkk; Type: DATABASE; Schema: -; Owner: pbkk
 --
 
-CREATE DATABASE pbkk WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'English_United States.1252' LC_CTYPE = 'English_United States.1252';
+-- CREATE DATABASE pbkk WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'English_United States.1252' LC_CTYPE = 'English_United States.1252';
 
 
 ALTER DATABASE pbkk OWNER TO pbkk;
@@ -127,7 +129,7 @@ ALTER TABLE ONLY public.users
 -- Name: pbkk_client; Type: SUBSCRIPTION; Schema: -; Owner: pbkk
 --
 
-CREATE SUBSCRIPTION pbkk_client CONNECTION 'user=pbkk password=nuzulcarrykita host=rsmbyk.com port=5432 dbname=pbkk' PUBLICATION pbkk_master WITH (connect = false, slot_name = 'pbkk_client');
+CREATE SUBSCRIPTION pbkk_client CONNECTION 'user=pbkk password=nuzulcarrykita host=rsmbyk.com port=15432 dbname=pbkk' PUBLICATION pbkk_master;
 
 
 ALTER SUBSCRIPTION pbkk_client OWNER TO pbkk;

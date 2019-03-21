@@ -17,12 +17,14 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER SYSTEM SET wal_level = logical;
+
 --
 -- TOC entry 2926 (class 1262 OID 16413)
 -- Name: pbkk; Type: DATABASE; Schema: -; Owner: pbkk
 --
 
-CREATE DATABASE pbkk WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
+-- CREATE DATABASE pbkk WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.UTF-8' LC_CTYPE = 'en_US.UTF-8';
 
 
 ALTER DATABASE pbkk OWNER TO pbkk;
@@ -154,7 +156,7 @@ ALTER PUBLICATION pbkk_master OWNER TO pbkk;
 
 --
 -- TOC entry 2920 (class 6106 OID 16435)
--- Name: pbkk_master users; Type: PUBLICATION TABLE; Schema: public; Owner: 
+-- Name: pbkk_master users; Type: PUBLICATION TABLE; Schema: public; Owner:
 --
 
 ALTER PUBLICATION pbkk_master ADD TABLE ONLY public.users;
