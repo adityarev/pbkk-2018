@@ -185,7 +185,7 @@ class Register extends Component {
                     variant="contained"
                     color="primary"
                     className={classes.submit}
-                    disabled={!online}
+                    // disabled={!online}
                   >
                     Register
                   </Button>

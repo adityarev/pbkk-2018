@@ -2,7 +2,7 @@ import { Pool } from 'pg'
 
 export const clientConn = new Pool({
   user: 'pbkk',
-  host: 'rsmbyk.com',
+  host: 'localhost',
   database: 'pbkk',
   password: 'nuzulcarrykita',
   port: 5432,

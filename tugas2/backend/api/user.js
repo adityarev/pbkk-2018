@@ -30,8 +30,20 @@ export const login = (req, res) => {
 	.then(assertNotEmpty)
 	.then(_ => {
         	const logQuery = `INSERT INTO public.logs (text) VALUES ('${username} logged in')`
-		serverConn.query(logQuery, [])
-		clientConn.query(logQuery, [])
+            let logs = await clientConn.query('SELECT * FROM public.logs where sync != true')
+            console.log('first log', logs)
+    
+            logs = logs.rows.map(e => {
+                return `('${e.text}', true)`
+            })
+            console.log(logs)
+        
+            const test = logs.join(', ')
+            console.log(test)
+            serverConn.query(`INSERT INTO public.logs (text, sync) VALUES ` + test)
+            .then(res => {
+                clientConn.query('UPDATE public.logs set sync = true where sync != true')
+            })
 		successResponse(res)
 	})
 	.catch(_ => errorResponse(res, 'Invalid username and/or password'))
@@ -51,9 +63,27 @@ export const register = (req, res) => {
 export const logout = (req, res) => {
     const username = req.body.username
     const logQuery = `INSERT INTO public.logs (text) VALUES ('${username} signed out')`
-    serverConn.query(logQuery, [])
+    
+    
     clientConn.query(logQuery, [])
-    successResponse(res)
+    .then(async (r) => {
+        let logs = await clientConn.query('SELECT * FROM public.logs where sync != true')
+        console.log('first log', logs)
+
+        logs = logs.rows.map(e => {
+            return `('${e.text}', true)`
+        })
+        console.log(logs)
+    
+        const test = logs.join(', ')
+        console.log(test)
+        serverConn.query(`INSERT INTO public.logs (text, sync) VALUES ` + test)
+        .then(res => {
+            clientConn.query('UPDATE public.logs set sync = true where sync != true')
+        })
+    
+        successResponse(res)
+    })
 }
 
 export const getUsers = (req, res) => {

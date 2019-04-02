@@ -126,7 +126,7 @@ class Home extends Component {
                   color="default"
                   className={classes.submit}
                   onClick={this.handleLogoutClick}
-                  disabled={this.state.isLoggingOut || !online}
+                  // disabled={this.state.isLoggingOut || !online}
                 >
                   Logout
                 </Button>

@@ -17,7 +17,7 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER SYSTEM SET wal_level = logical;
+-- ALTER SYSTEM SET wal_level = logical;
 
 --
 -- TOC entry 2825 (class 1262 OID 16521)
