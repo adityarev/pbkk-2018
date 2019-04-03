@@ -25,14 +25,24 @@ app.use((req, res, next) => {
 })
 
 app.post('/login', (req, res) => {
-    const { username, password } = req.params
+    const sendError = message => res.status(400).send({ 'message': message })
 
-    // Put validation here
-    // res.status(400).send({ message: 'Cih' });
+    const username_alphanumeric = /^[\w]+$/
+    const password_length = /^(.{8,})$/
+    const password_strength = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9 ]).+$/i
 
-    res.status(200).send({ message: "OK" });
+    if (!username_alphanumeric.test(username))
+        sendError('Username must contain alphanumeric characters only')
+
+    else if (!password_length.test(password))
+        sendError('Password must be 8 characters or longer')
+
+    else if (!password_strength.test(password))
+        sendError('Password must contain at least 1 lowercase, 1 uppercase, 1 numeric, and 1 special character')
+
+    else
+        res.status(200).send({ message: "GAS" })
 })
 
-app.listen(PORT, () => {
-    console.log(`[ Express ] Running on port ${PORT}.`)
-})
+app.listen(PORT, () =>
+    console.log(`[ Express ] Running on port ${PORT}.`))
