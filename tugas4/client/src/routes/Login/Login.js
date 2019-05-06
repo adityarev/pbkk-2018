@@ -4,10 +4,13 @@ import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import FormControl from '@material-ui/core/FormControl'
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
+import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper'
+import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 import StyledComponent from '../../styledComponents/base'
@@ -32,7 +35,8 @@ class Login extends Component {
     this.state = {
       savedForm: {
         username: '',
-        password: ''
+        password: '',
+        gate: ''
       },
       snackbar: {
         isActive: false,
@@ -141,7 +145,7 @@ class Login extends Component {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Login Validation
+              Login Gate
             </Typography>
             <form className={classes.form} onSubmit={this.handleOnSubmit}>
               <FormControl margin="normal" required fullWidth>
@@ -153,6 +157,26 @@ class Login extends Component {
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <Input name="password" type="password" id="password" autoComplete="current-password"
                   onChange={this.handleOnChange} />
+              </FormControl>
+              <FormControl required className={classes.formControl}>
+                <InputLabel htmlFor="gate-required">Gate</InputLabel>
+                <Select
+                  value={this.state.savedForm.gate}
+                  onChange={this.handleOnChange}
+                  name="gate"
+                  inputProps={{
+                    id: 'gate-required',
+                  }}
+                  className={classes.selectEmpty}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={"1"}>Gate 1</MenuItem>
+                  <MenuItem value={"2"}>Gate 2</MenuItem>
+                  <MenuItem value={"3"}>Gate 3</MenuItem>
+                </Select>
+                <FormHelperText>Required</FormHelperText>
               </FormControl>
               <Detector
                 render={({ online }) => (
