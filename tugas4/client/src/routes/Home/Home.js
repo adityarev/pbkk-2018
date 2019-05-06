@@ -7,12 +7,12 @@ import HomeRounded from '@material-ui/icons/HomeRounded'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
-import StyledComponent from '../../styledComponents/base'
-import SnackbarContent from '../../components/Snackbar/SnackbarContent'
 
 import { Offline, Detector } from 'react-detect-offline'
 import { Redirect } from 'react-router-dom'
 import Cookies from 'universal-cookie'
+import HomeStyledComponent from '../../styledComponents/home'
+import SnackbarContent from '../../components/Snackbar/SnackbarContent'
 
 const cookies = new Cookies()
 
@@ -83,4 +83,4 @@ class Home extends Component {
   }
 }
 
-export default withStyles(StyledComponent)(Home)
+export default withStyles(HomeStyledComponent)(Home)
