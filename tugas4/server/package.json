@@ -1,12 +1,13 @@
 {
-  "name": "tugas2",
+  "name": "pbkk-gate-system",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./client,./.babelrc,./package.json,./npm-debug.log --copy-files",
-    "start": "npm run build && node dist/index.js"
+    "start": "npm run build && node dist/index.js",
+    "syncdb": "npm run build && node dist/syncdb.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +16,9 @@
     "express": "^4.16.4",
     "indexeddb-js": "0.0.14",
     "morgan": "^1.9.1",
-    "pg": "^7.8.1"
+    "pg": "^7.10.0",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^5.8.5"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
