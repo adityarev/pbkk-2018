@@ -34,12 +34,13 @@ class Login extends Component {
 
     this.state = {
       hasError: {
-        gateRequired: false
+        gateIdRequired: false
       },
+      gates: [],
       savedForm: {
         username: '',
         password: '',
-        gate: ''
+        gateId: 0
       },
       snackbar: {
         isActive: false,
@@ -50,8 +51,30 @@ class Login extends Component {
     }
   }
 
+  componentDidMount() {
+    axios.get(`http://localhost:5000/api/gates`, {})
+      .then(res => {
+        if (res.status === 200) {
+          this.setState({
+            ...this.state,
+            gates: res.data.result
+          })
+        }
+      })
+      .catch(error => {
+        if (error.response) {
+          this.handleRequestFailed(error.response.data.message)
+        } else if (error.request) {
+          this.handleRequestFailed('Can\'t connect to server!')
+        } else {
+          console.log('Error', error.message)
+        }
+        console.log(error.config)
+      })
+  }
+
   checkErrorRequired = (callback) => {
-    const { gate } = this.state.savedForm
+    const { gateId } = this.state.savedForm
 
     this.setState({
       ...this.state,
@@ -60,12 +83,12 @@ class Login extends Component {
         gateRequired: false
       }
     }, () => {
-      if (gate.length === 0) {
+      if (gateId === 0) {
         this.setState({
           ...this.state,
           hasError: {
             ...this.state.hasError,
-            gateRequired: true
+            gateIdRequired: true
           }
         })
       } else {
@@ -89,21 +112,22 @@ class Login extends Component {
   handleOnSubmit = (event) => {
     event.preventDefault()
     this.checkErrorRequired(() => {
-      if (!this.state.hasError.gateRequired) {
-        const { savedForm } = this.state
-        axios.post(`http://localhost:5000/login`, { ...savedForm })
+      if (!this.state.hasError.gateIdRequired) {
+        const { savedForm, gates } = this.state
+        axios.post(`http://localhost:5000/api/auth/login`, { ...savedForm })
           .then(res => {
-            console.log(res)
-  
             if (res.status === 200) {
-              this.handleLoginSuccess(savedForm.username)
+              const { username } = savedForm
+              const gateName = gates.find(gate => gate.id === savedForm.gateId).name
+
+              this.handleLoginSuccess(username, gateName)
             }
           })
           .catch(error => {
             if (error.response) {
-              this.handleLoginFailed(error.response.data.message)
+              this.handleRequestFailed(error.response.data.messages)
             } else if (error.request) {
-              this.handleLoginFailed('Can\'t connect to server!')
+              this.handleRequestFailed('Can\'t connect to server!')
             } else {
               console.log('Error', error.message)
             }
@@ -113,16 +137,17 @@ class Login extends Component {
     })
   }
 
-  handleLoginSuccess = (username) => {
+  handleLoginSuccess = (username, gate) => {
     this.setState({
       ...this.state,
       shouldRedirect: true
     }, () => {
       cookies.set('username', username, { path: '/' })
+      cookies.set('gate', gate, { path: '/' })
     })
   }
 
-  handleLoginFailed = (message) => {
+  handleRequestFailed = (message) => {
     this.setState({
       ...this.state,
       snackbar: {
@@ -189,24 +214,24 @@ class Login extends Component {
                   onChange={this.handleOnChange} />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="gate">Gate</InputLabel>
+                <InputLabel htmlFor="gateId">Gate</InputLabel>
                 <Select
-                  value={this.state.savedForm.gate}
+                  value={this.state.savedForm.gateId}
                   onChange={this.handleOnChange}
-                  name="gate"
+                  name="gateId"
                   inputProps={{
-                    id: 'gate',
+                    id: 'gateId',
                   }}
                   className={classes.selectEmpty}
                 >
-                  <MenuItem value="">
+                  <MenuItem value={0}>
                     <em>None</em>
                   </MenuItem>
-                  <MenuItem value={"1"}>Gate 1</MenuItem>
-                  <MenuItem value={"2"}>Gate 2</MenuItem>
-                  <MenuItem value={"3"}>Gate 3</MenuItem>
+                  {
+                    this.state.gates.map(gate => <MenuItem key={gate.id} value={gate.id}>{gate.name}</MenuItem>)
+                  }
                 </Select>
-                {this.state.hasError.gateRequired && <FormHelperText>Required</FormHelperText>}
+                {this.state.hasError.gateIdRequired && <FormHelperText>Required</FormHelperText>}
               </FormControl>
               <Detector
                 render={({ online }) => (
