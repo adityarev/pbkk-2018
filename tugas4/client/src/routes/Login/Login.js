@@ -4,7 +4,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import FormControl from '@material-ui/core/FormControl'
-// import FormHelperText from '@material-ui/core/FormHelperText';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
@@ -33,6 +33,9 @@ class Login extends Component {
     super(props)
 
     this.state = {
+      hasError: {
+        gateRequired: false
+      },
       savedForm: {
         username: '',
         password: '',
@@ -45,6 +48,30 @@ class Login extends Component {
       },
       shouldRedirect: false
     }
+  }
+
+  checkErrorRequired = (callback) => {
+    const { gate } = this.state.savedForm
+
+    this.setState({
+      ...this.state,
+      hasError: {
+        ...this.state.hasError,
+        gateRequired: false
+      }
+    }, () => {
+      if (gate.length === 0) {
+        this.setState({
+          ...this.state,
+          hasError: {
+            ...this.state.hasError,
+            gateRequired: true
+          }
+        })
+      } else {
+        callback()
+      }
+    })
   }
 
   handleOnChange = (event) => {
@@ -61,26 +88,29 @@ class Login extends Component {
 
   handleOnSubmit = (event) => {
     event.preventDefault()
-
-    const { savedForm } = this.state
-    axios.post(`http://localhost:5000/login`, { ...savedForm })
-      .then(res => {
-        console.log(res)
-
-        if (res.status === 200) {
-          this.handleLoginSuccess(savedForm.username)
-        }
-      })
-      .catch(error => {
-        if (error.response) {
-          this.handleLoginFailed(error.response.data.message)
-        } else if (error.request) {
-          this.handleLoginFailed('Can\'t connect to server!')
-        } else {
-          console.log('Error', error.message)
-        }
-        console.log(error.config)
-      })
+    this.checkErrorRequired(() => {
+      if (!this.state.hasError.gateRequired) {
+        const { savedForm } = this.state
+        axios.post(`http://localhost:5000/login`, { ...savedForm })
+          .then(res => {
+            console.log(res)
+  
+            if (res.status === 200) {
+              this.handleLoginSuccess(savedForm.username)
+            }
+          })
+          .catch(error => {
+            if (error.response) {
+              this.handleLoginFailed(error.response.data.message)
+            } else if (error.request) {
+              this.handleLoginFailed('Can\'t connect to server!')
+            } else {
+              console.log('Error', error.message)
+            }
+            console.log(error.config)
+          })
+      }
+    })
   }
 
   handleLoginSuccess = (username) => {
@@ -152,22 +182,20 @@ class Login extends Component {
                 <InputLabel htmlFor="username">Username</InputLabel>
                 <Input id="username" name="username" autoComplete="username" autoFocus
                   onChange={this.handleOnChange} />
-                {/* <FormHelperText>Required</FormHelperText> */}
               </FormControl>
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="password">Password</InputLabel>
-                <Input name="password" type="password" id="password" autoComplete="current-password"
+                <Input name="password" type="password" id="password" autoComplete="password"
                   onChange={this.handleOnChange} />
-                {/* <FormHelperText>Required</FormHelperText> */}
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="gate-required">Gate</InputLabel>
+                <InputLabel htmlFor="gate">Gate</InputLabel>
                 <Select
                   value={this.state.savedForm.gate}
                   onChange={this.handleOnChange}
                   name="gate"
                   inputProps={{
-                    id: 'gate-required',
+                    id: 'gate',
                   }}
                   className={classes.selectEmpty}
                 >
@@ -178,7 +206,7 @@ class Login extends Component {
                   <MenuItem value={"2"}>Gate 2</MenuItem>
                   <MenuItem value={"3"}>Gate 3</MenuItem>
                 </Select>
-                {/* <FormHelperText>Required</FormHelperText> */}
+                {this.state.hasError.gateRequired && <FormHelperText>Required</FormHelperText>}
               </FormControl>
               <Detector
                 render={({ online }) => (
