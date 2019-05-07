@@ -35,6 +35,7 @@ class Home extends Component {
       shouldRedirect: true
     }, () => {
       cookies.remove('username')
+      cookies.remove('gate')
     })
   }
 
@@ -60,7 +61,7 @@ class Home extends Component {
               <HomeRounded />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Welcome, {cookies.get('username')}!
+              Hi, {cookies.get('username')}. Welcome to {cookies.get('gate')}!
             </Typography>
             <Detector
               render={({ online }) => (
