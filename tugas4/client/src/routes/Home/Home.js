@@ -8,11 +8,10 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 
-import { Offline, Detector } from 'react-detect-offline'
 import { Redirect } from 'react-router-dom'
 import Cookies from 'universal-cookie'
 import HomeStyledComponent from '../../styledComponents/home'
-import SnackbarContent from '../../components/Snackbar/SnackbarContent'
+// import SnackbarContent from '../../components/Snackbar/SnackbarContent'
 
 const cookies = new Cookies()
 
@@ -52,31 +51,21 @@ class Home extends Component {
         <main className={classes.main}>
           <CssBaseline />
           <Paper className={classes.paper}>
-            <Offline>
-              <SnackbarContent
-                variant="warning"
-                message="You're offline!" />
-            </Offline>
             <Avatar className={classes.avatar}>
               <HomeRounded />
             </Avatar>
             <Typography component="h1" variant="h5">
               Hi, {cookies.get('username')}. Welcome to {cookies.get('gate')}!
             </Typography>
-            <Detector
-              render={({ online }) => (
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="default"
-                  className={classes.submit}
-                  onClick={this.handleLogout}
-                  disabled={!online}
-                >
-                  Logout
-                </Button>
-              )}
-            />
+            <Button
+              fullWidth
+              variant="contained"
+              color="default"
+              className={classes.submit}
+              onClick={this.handleLogout}
+            >
+              Logout
+            </Button>
           </Paper>
         </main>
       </Fragment>
