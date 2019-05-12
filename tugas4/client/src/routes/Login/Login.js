@@ -14,12 +14,10 @@ import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 
-import { Offline, Detector } from 'react-detect-offline'
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'universal-cookie'
 import LoginStyledComponent from '../../styledComponents/login'
-import SnackbarContent from '../../components/Snackbar/SnackbarContent'
 import SnackbarPopUp from '../../components/Snackbar/SnackbarPopUp'
 
 const cookies = new Cookies()
@@ -191,11 +189,6 @@ class Login extends Component {
         <main className={classes.main}>
           <CssBaseline />
           <Paper className={classes.paper}>
-            <Offline>
-              <SnackbarContent
-                variant="warning"
-                message="You're offline!" />
-            </Offline>
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -233,20 +226,15 @@ class Login extends Component {
                 </Select>
                 {this.state.hasError.gateIdRequired && <FormHelperText>Required</FormHelperText>}
               </FormControl>
-              <Detector
-                render={({ online }) => (
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    disabled={!online}
-                  >
-                    Login
-                  </Button>
-                )}
-              />
+              <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Login
+                </Button>
             </form>
           </Paper>
         </main>
