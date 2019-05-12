@@ -3,6 +3,13 @@ const AdminHomeStyledComponent = theme => ({
     margin: theme.spacing.unit,
     backgroundColor: theme.palette.secondary.main,
   },
+  gridList: {
+    width: 'auto',
+    height: 'auto',
+  },
+  icon: {
+    color: 'rgba(255, 255, 255, 0.54)',
+  },
   main: {
     width: 'auto',
     display: 'block', // Fix IE 11 issue.
@@ -20,6 +27,13 @@ const AdminHomeStyledComponent = theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     padding: `${theme.spacing.unit * 2}px ${theme.spacing.unit * 3}px ${theme.spacing.unit * 3}px`,
+  },
+  root: {
+    display: 'block',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    overflow: 'hidden',
+    backgroundColor: theme.palette.background.paper,
   },
   submit: {
     marginTop: theme.spacing.unit * 3,
