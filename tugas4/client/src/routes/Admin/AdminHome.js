@@ -43,6 +43,11 @@ class AdminHome extends Component {
           img: 'https://image.flaticon.com/icons/png/512/33/33308.png',
           link: '/admin/users',
           title: 'View Users'
+        },
+        {
+          img: 'https://image.flaticon.com/icons/png/512/32/32441.png',
+          link: '/admin/groups',
+          title: 'View Groups'
         }
       ]
     }
