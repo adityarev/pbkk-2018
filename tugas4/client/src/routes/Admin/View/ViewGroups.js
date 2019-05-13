@@ -23,6 +23,7 @@ import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 
+import { BACKEND_SERVER } from '../../../constants/constants'
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'universal-cookie'
@@ -62,7 +63,7 @@ class AdminViewGroups extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:5000/api/groups`, {})
+    axios.get(`${BACKEND_SERVER}/api/groups`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
@@ -95,7 +96,7 @@ class AdminViewGroups extends Component {
 
   handleAddSubmit = () => {
     const { savedForm } = this.state
-    axios.post(`http://localhost:5000/api/groups`, { name: savedForm.groupName })
+    axios.post(`${BACKEND_SERVER}/api/groups`, { name: savedForm.groupName })
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -132,7 +133,7 @@ class AdminViewGroups extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`http://localhost:5000/api/groups/${savedForm.groupId}`, {})
+    axios.delete(`${BACKEND_SERVER}/api/groups/${savedForm.groupId}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()

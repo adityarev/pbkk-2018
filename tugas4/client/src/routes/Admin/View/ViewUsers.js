@@ -28,6 +28,7 @@ import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 
+import { BACKEND_SERVER } from '../../../constants/constants'
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'universal-cookie'
@@ -76,14 +77,14 @@ class AdminViewUsers extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:5000/api/users`, {})
+    axios.get(`${BACKEND_SERVER}/api/users`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
             ...this.state,
             users: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
           }, () => {
-            axios.get(`http://localhost:5000/api/groups`, {})
+            axios.get(`${BACKEND_SERVER}/api/groups`, {})
               .then(res => {
                 if (res.status === 200) {
                   this.setState({
@@ -139,7 +140,7 @@ class AdminViewUsers extends Component {
 
     this.checkErrorRequired(() => {
       this.checkErrorRetype(() => {
-        axios.post(`http://localhost:5000/api/users`, { ...savedForm })
+        axios.post(`${BACKEND_SERVER}/api/users`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
               window.location.reload()
@@ -184,7 +185,7 @@ class AdminViewUsers extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`http://localhost:5000/api/users/${savedForm.userId}`, {})
+    axios.delete(`${BACKEND_SERVER}/api/users/${savedForm.userId}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()

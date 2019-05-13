@@ -14,6 +14,7 @@ import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
 
+import { BACKEND_SERVER } from '../../constants/constants'
 import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 import Cookies from 'universal-cookie'
@@ -50,7 +51,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:5000/api/gates`, {})
+    axios.get(`${BACKEND_SERVER}/api/gates`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
@@ -112,7 +113,7 @@ class Login extends Component {
     this.checkErrorRequired(() => {
       if (!this.state.hasError.gateIdRequired) {
         const { savedForm, gates } = this.state
-        axios.post(`http://localhost:5000/api/auth/login`, { ...savedForm })
+        axios.post(`${BACKEND_SERVER}/api/auth/login`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
               const { username } = savedForm
