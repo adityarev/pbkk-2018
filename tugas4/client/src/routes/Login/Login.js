@@ -50,7 +50,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:5000/api/gates`, {})
+    axios.get(`http://45.32.99.52:5000/api/gates`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
@@ -112,7 +112,7 @@ class Login extends Component {
     this.checkErrorRequired(() => {
       if (!this.state.hasError.gateIdRequired) {
         const { savedForm, gates } = this.state
-        axios.post(`http://localhost:5000/api/auth/login`, { ...savedForm })
+        axios.post(`http://45.32.99.52:5000/api/auth/login`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
               const { username } = savedForm
