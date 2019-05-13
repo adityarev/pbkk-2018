@@ -303,7 +303,6 @@ class AdminViewGroups extends Component {
               fullWidth
               onChange={this.handleOnChange}
               value={this.state.savedForm.groupName}
-              disabled
             />
           </DialogContent>
           <DialogActions>
