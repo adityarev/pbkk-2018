@@ -48,6 +48,11 @@ class AdminHome extends Component {
           img: 'https://image.flaticon.com/icons/png/512/32/32441.png',
           link: '/admin/groups',
           title: 'View Groups'
+        },
+        {
+          img: 'https://cdn0.iconfinder.com/data/icons/business-finance-11/100/icon-35-512.png',
+          link: '/admin/rules',
+          title: 'View Rules'
         }
       ]
     }
@@ -95,7 +100,8 @@ class AdminHome extends Component {
               <SupervisorAccountRounded />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Welcome, {cookies.get('username')}!
+              {/* Welcome, {cookies.get('username')}! */}
+              Welcome, Admin!
             </Typography>
             <div className={classes.root}>
               <GridList cellHeight={180} className={classes.gridList}>
