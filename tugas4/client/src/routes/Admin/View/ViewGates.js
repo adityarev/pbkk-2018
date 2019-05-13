@@ -303,7 +303,6 @@ class AdminViewGates extends Component {
               fullWidth
               onChange={this.handleOnChange}
               value={this.state.savedForm.gateName}
-              disabled
             />
           </DialogContent>
           <DialogActions>
