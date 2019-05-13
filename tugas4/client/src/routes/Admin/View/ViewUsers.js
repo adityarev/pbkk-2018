@@ -161,8 +161,6 @@ class AdminViewUsers extends Component {
   }
 
   handleDeleteClick = (userId) => {
-    console.log(userId)
-
     const { users } = this.state
     const user = users.find(user => user.id === userId)
 
@@ -245,7 +243,7 @@ class AdminViewUsers extends Component {
       ...this.state,
       hasError: {
         ...this.state.hasError,
-        groupRequired: false
+        groupIdRequired: false
       }
     }, () => {
       if (groupId === '0') {
