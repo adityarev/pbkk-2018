@@ -1,9 +1,9 @@
-import * as auth from './views/auth'
-import * as gates from './views/gates'
-import * as groups from './views/groups'
-import * as users from './views/users'
-import * as rules from './views/rules'
-import * as logs from './views/logs'
+import * as auth from './api/views/auth'
+import * as gates from './api/views/gates'
+import * as groups from './api/views/groups'
+import * as users from './api/views/users'
+import * as rules from './api/views/rules'
+import * as logs from './api/views/logs'
 
 
 export const initialize_endpoints = app => {
