@@ -77,21 +77,21 @@ class AdminViewRules extends Component {
   }
 
   componentDidMount() {
-    axios.get(`${BACKEND_SERVER}/api/rules`, {})
+    axios.get(`${BACKEND_SERVER}/rules`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
             ...this.state,
             rules: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
           }, () => {
-            axios.get(`${BACKEND_SERVER}/api/groups`, {})
+            axios.get(`${BACKEND_SERVER}/groups`, {})
               .then(res => {
                 if (res.status === 200) {
                   this.setState({
                     ...this.state,
                     groups: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
                   }, () => {
-                    axios.get(`${BACKEND_SERVER}/api/gates`, {})
+                    axios.get(`${BACKEND_SERVER}/gates`, {})
                       .then(res => {
                         if (res.status === 200) {
                           this.setState({
@@ -183,7 +183,7 @@ class AdminViewRules extends Component {
     const { savedForm } = this.state
 
     this.checkErrorRequired(() => {
-      axios.post(`${BACKEND_SERVER}/api/rules`, { ...savedForm })
+      axios.post(`${BACKEND_SERVER}/rules`, { ...savedForm })
         .then(res => {
           if (res.status === 200) {
             window.location.reload()
@@ -244,7 +244,7 @@ class AdminViewRules extends Component {
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
 
-    axios.delete(`${BACKEND_SERVER}/api/rules/${savedForm.ruleId}`, {})
+    axios.delete(`${BACKEND_SERVER}/rules/${savedForm.ruleId}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()

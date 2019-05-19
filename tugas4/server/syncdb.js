@@ -1,5 +1,5 @@
-import { sequelize } from './api/db/conn'
-import * as models  from './api/db/models'
+import { sequelize } from './db/conn'
+import * as models  from './db/models'
 
 
 sequelize.sync({ force: true })
