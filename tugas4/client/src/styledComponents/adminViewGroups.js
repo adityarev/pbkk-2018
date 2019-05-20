@@ -9,6 +9,10 @@ const AdminViewGroupsStyledComponent = theme => ({
   fab: {
     margin: theme.spacing.unit,
   },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing.unit,
+  },
   main: {
     width: 'auto',
     display: 'block', // Fix IE 11 issue.
@@ -31,6 +35,9 @@ const AdminViewGroupsStyledComponent = theme => ({
     width: '100%',
     marginTop: theme.spacing.unit * 3,
     overflowX: 'auto',
+  },
+  selectEmpty: {
+    marginTop: theme.spacing.unit * 2,
   },
   submit: {
     marginTop: theme.spacing.unit * 3,

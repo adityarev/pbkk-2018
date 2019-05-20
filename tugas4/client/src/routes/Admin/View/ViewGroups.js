@@ -10,10 +10,14 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
-import EditIcon from '@material-ui/icons/EditRounded'
 import Fab from '@material-ui/core/Fab'
+import FormControl from '@material-ui/core/FormControl'
+import FormHelperText from '@material-ui/core/FormHelperText'
+import InputLabel from '@material-ui/core/InputLabel'
 import InfoIcon from '@material-ui/icons/Info'
+import MenuItem from '@material-ui/core/MenuItem'
 import Paper from '@material-ui/core/Paper'
+import Select from '@material-ui/core/Select'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
@@ -50,9 +54,14 @@ class AdminViewGroups extends Component {
         isActive: false,
         key: ''
       },
+      hasError: {
+        groupRequired: false,
+        gateRequired: false
+      },
       savedForm: {
-        groupId: '',
-        groupName: '',
+        id: 0,
+        group: '',
+        gate: '',
       },
       snackbar: {
         isActive: false,
@@ -68,7 +77,27 @@ class AdminViewGroups extends Component {
         if (res.status === 200) {
           this.setState({
             ...this.state,
-            groups: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
+            groups: res.data.message.sort((a, b) => (a.id < b.id ? -1 : 1))
+          }, () => {
+            axios.get(`${BACKEND_SERVER}/gates`, {})
+              .then(res => {
+                if (res.status === 200) {
+                  this.setState({
+                    ...this.state,
+                    gates: res.data.message.sort((a, b) => (a.gate < b.gate ? -1 : 1))
+                  })
+                }
+              })
+              .catch(error => {
+                if (error.response) {
+                  this.handleRequestFailed(error.response.data.message)
+                } else if (error.request) {
+                  this.handleRequestFailed('Can\'t connect to server!')
+                } else {
+                  console.log('Error', error.message)
+                }
+                console.log(error.config)
+              })
           })
         }
       })
@@ -84,9 +113,40 @@ class AdminViewGroups extends Component {
       })
   }
 
+  checkErrorRequired = (callback) => {
+    const { savedForm } = this.state
+
+    this.setState({
+      ...this.state,
+      hasError: {
+        ...this.state.hasError,
+        groupRequired: false
+      }
+    }, () => {
+      const { gate, group } = savedForm
+
+      if (gate === '' || group === '') {
+        this.setState({
+          ...this.state,
+          hasError: {
+            gateRequired: gate === '',
+            groupRequired: group === ''
+          }
+        })
+      } else {
+        callback()
+      }
+    })
+  }
+
   handleAddClick = () => {
     this.setState({
       ...this.state,
+      savedForm: {
+        id: 0,
+        group: '',
+        gate: '',
+      },
       dialog: {
         isActive: true,
         key: 'add'
@@ -95,34 +155,36 @@ class AdminViewGroups extends Component {
   }
 
   handleAddSubmit = () => {
-    const { savedForm } = this.state
-    axios.post(`${BACKEND_SERVER}/groups`, { name: savedForm.groupName })
-      .then(res => {
-        if (res.status === 200) {
-          window.location.reload()
-        }
-      })
-      .catch(error => {
-        if (error.response) {
-          this.handleRequestFailed(error.response.data.messages)
-        } else if (error.request) {
-          this.handleRequestFailed('Can\'t connect to server!')
-        } else {
-          console.log('Error', error.message)
-        }
-        console.log(error.config)
-      })
+    this.checkErrorRequired(() => {
+      const { savedForm } = this.state
+    
+      axios.post(`${BACKEND_SERVER}/groups`, { ...savedForm })
+        .then(res => {
+          if (res.status === 200) {
+            window.location.reload()
+          }
+        })
+        .catch(error => {
+          if (error.response) {
+            this.handleRequestFailed(error.response.data.message)
+          } else if (error.request) {
+            this.handleRequestFailed('Can\'t connect to server!')
+          } else {
+            console.log('Error', error.message)
+          }
+          console.log(error.config)
+        })
+    })
   }
 
   handleDeleteClick = (groupId) => {
-    const { groups } = this.state
-
     this.setState({
       ...this.state,
       savedForm: {
         ...this.state.savedForm,
-        groupId: groupId.toString(10),
-        groupName: groups.find(group => group.id === groupId).name
+        id: groupId,
+        group: '',
+        gate: ''
       },
       dialog: {
         isActive: true,
@@ -133,7 +195,7 @@ class AdminViewGroups extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`${BACKEND_SERVER}/groups/${savedForm.groupId}`, {})
+    axios.delete(`${BACKEND_SERVER}/groups/${savedForm.id}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -141,7 +203,7 @@ class AdminViewGroups extends Component {
       })
       .catch(error => {
         if (error.response) {
-          this.handleRequestFailed(error.response.data.messages)
+          this.handleRequestFailed(error.response.data.message)
         } else if (error.request) {
           this.handleRequestFailed('Can\'t connect to server!')
         } else {
@@ -149,27 +211,6 @@ class AdminViewGroups extends Component {
         }
         console.log(error.config)
       })
-  }
-
-  handleEditClick = (groupId) => {
-    const { groups } = this.state
-
-    this.setState({
-      ...this.state,
-      savedForm: {
-        ...this.state.savedForm,
-        groupId: groupId.toString(10),
-        groupName: groups.find(group => group.id === groupId).name
-      },
-      dialog: {
-        isActive: true,
-        key: 'edit'
-      }
-    })
-  }
-
-  handleEditSubmit = () => {
-    console.log('Submitting edit form ...')
   }
 
   handleDialogClose = () => {
@@ -226,7 +267,14 @@ class AdminViewGroups extends Component {
     })
   }
 
-  renderAddDialog = () => {
+  renderFormDialog = () => {
+    const { classes } = this.props
+    const {
+      gates,
+      hasError,
+      savedForm
+    } = this.state
+
     return (
       <Dialog
           open={true}
@@ -238,13 +286,36 @@ class AdminViewGroups extends Component {
             <TextField
               autoFocus
               margin="dense"
-              id="groupName"
-              name="groupName"
+              id="group"
+              name="group"
               label="Group Name"
               type="text"
               fullWidth
               onChange={this.handleOnChange}
             />
+            {hasError.groupRequired && <FormHelperText>Required</FormHelperText>}
+            <form className={classes.form} onSubmit={this.handleOnSubmit}>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="gate">Gate</InputLabel>
+                <Select
+                  value={savedForm.gate}
+                  onChange={this.handleOnChange}
+                  name="gate"
+                  inputProps={{
+                    id: 'gate',
+                  }}
+                  className={classes.selectEmpty}
+                >
+                  <MenuItem value={''}>
+                    <em>None</em>
+                  </MenuItem>
+                  {
+                    gates.map(gate => <MenuItem key={gate.id} value={gate.gate}>{gate.gate}</MenuItem>)
+                  }
+                </Select>
+                {hasError.gateRequired && <FormHelperText>Required</FormHelperText>}
+              </FormControl>
+            </form>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleDialogClose} color="primary">
@@ -259,7 +330,7 @@ class AdminViewGroups extends Component {
   }
 
   renderDeleteDialog = () => {
-    const { groupName } = this.state.savedForm
+    const { savedForm } = this.state
 
     return (
       <Dialog
@@ -270,7 +341,7 @@ class AdminViewGroups extends Component {
           <DialogTitle id="form-dialog-title">Delete Group?</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Group named '{groupName}' will be deleted. Are you sure?
+              Group with id '{savedForm.id}' will be deleted. Are you sure?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -285,47 +356,12 @@ class AdminViewGroups extends Component {
     )
   }
 
-  renderEditDialog = () => {
-    return (
-      <Dialog
-          open={true}
-          onClose={this.handleDialogClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Edit Group</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="groupName"
-              name="groupName"
-              label="Group Name"
-              type="text"
-              fullWidth
-              onChange={this.handleOnChange}
-              value={this.state.savedForm.groupName}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleDialogClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handleEditSubmit} color="primary" disabled>
-              Save Changes
-            </Button>
-          </DialogActions>
-        </Dialog>
-    )
-  }
-
   renderDialog = () => {
     const { key } = this.state.dialog
 
     switch (key) {
       case 'add':
-        return this.renderAddDialog()
-      case 'edit':
-        return this.renderEditDialog()
+        return this.renderFormDialog()
       case 'delete':
         return this.renderDeleteDialog()
       default:
@@ -368,7 +404,8 @@ class AdminViewGroups extends Component {
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
-                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="left">Group</TableCell>
+                  <TableCell align="left">Gate</TableCell>
                   <TableCell align="left">Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -378,9 +415,9 @@ class AdminViewGroups extends Component {
                     <TableCell component="th" scope="row">
                       {group.id}
                     </TableCell>
-                    <TableCell align="left">{group.name}</TableCell>
+                    <TableCell align="left">{group.group_name}</TableCell>
+                    <TableCell align="left">{group.gate_id}</TableCell>
                     <TableCell align="left">
-                      <EditIcon onClick={() => this.handleEditClick(group.id)} />
                       <DeleteIcon onClick={() => this.handleDeleteClick(group.id)} />
                     </TableCell>
                   </TableRow>

@@ -154,7 +154,7 @@ class AdminViewUsers extends Component {
           })
           .catch(error => {
             if (error.response) {
-              this.handleRequestFailed(error.response.data.messages)
+              this.handleRequestFailed(error.response.data.message)
             } else if (error.request) {
               this.handleRequestFailed('Can\'t connect to server!')
             } else {
@@ -196,7 +196,7 @@ class AdminViewUsers extends Component {
       })
       .catch(error => {
         if (error.response) {
-          this.handleRequestFailed(error.response.data.messages)
+          this.handleRequestFailed(error.response.data.message)
         } else if (error.request) {
           this.handleRequestFailed('Can\'t connect to server!')
         } else {
@@ -238,7 +238,7 @@ class AdminViewUsers extends Component {
           })
           .catch(error => {
             if (error.response) {
-              this.handleRequestFailed(error.response.data.messages)
+              this.handleRequestFailed(error.response.data.message)
             } else if (error.request) {
               this.handleRequestFailed('Can\'t connect to server!')
             } else {
