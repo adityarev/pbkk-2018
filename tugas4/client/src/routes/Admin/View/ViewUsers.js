@@ -57,16 +57,13 @@ class AdminViewUsers extends Component {
         key: ''
       },
       hasError: {
-        // matchRetype: false,
-        groupIdRequired: false,
+        groupRequired: false,
       },
       savedForm: {
-        userId: '',
-        username: '',
+        nrp: '',
         password: '',
         retype: '',
-        groupId: '',
-        groupName: ''
+        group: '',
       },
       snackbar: {
         isActive: false,
@@ -82,14 +79,24 @@ class AdminViewUsers extends Component {
         if (res.status === 200) {
           this.setState({
             ...this.state,
-            users: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
+            users: res.data.message.sort((a, b) => (a.id < b.id ? -1 : 1))
           }, () => {
             axios.get(`${BACKEND_SERVER}/groups`, {})
               .then(res => {
                 if (res.status === 200) {
+                  let dict = new Map()
+
                   this.setState({
                     ...this.state,
-                    groups: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
+                    groups: res.data.message
+                               .sort((a, b) => (a.id < b.id ? -1 : 1))
+                               .filter(group => {
+                                  if (!dict.has(group.group_name)) {
+                                    dict.set(group.group_name, true)
+                                    return true
+                                  }
+                                  return false
+                               })
                   })
                 }
               })
@@ -122,11 +129,10 @@ class AdminViewUsers extends Component {
     this.setState({
       ...this.state,
       savedForm: {
-        username: '',
+        nrp: '',
         password: '',
         retype: '',
-        userId: '',
-        groupId: ''
+        group: ''
       },
       dialog: {
         isActive: true,
@@ -164,15 +170,13 @@ class AdminViewUsers extends Component {
     const { users } = this.state
     const user = users.find(user => user.id === userId)
 
-    console.log(user)
-
     this.setState({
       ...this.state,
       savedForm: {
-        ...this.state.savedForm,
-        userId: userId.toString(10),
-        username: user.username,
-        groupId: user.groupId.toString(10)
+        nrp: user.nrp,
+        password: '',
+        retype: '',
+        group: ''
       },
       dialog: {
         isActive: true,
@@ -183,7 +187,8 @@ class AdminViewUsers extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`${BACKEND_SERVER}/users/${savedForm.userId}`, {})
+
+    axios.delete(`${BACKEND_SERVER}/users/${savedForm.nrp}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -208,12 +213,10 @@ class AdminViewUsers extends Component {
     this.setState({
       ...this.state,
       savedForm: {
-        ...this.state.savedForm,
-        userId: userId.toString(10),
-        username: user.username,
+        nrp: user.nrp,
         password: '',
         retype: '',
-        groupId: user.groupId
+        group: user.grup_id
       },
       dialog: {
         isActive: true,
@@ -223,7 +226,28 @@ class AdminViewUsers extends Component {
   }
 
   handleEditSubmit = () => {
-    console.log('Submitting edit form ...')
+    const { savedForm } = this.state
+
+    this.checkErrorRequired(() => {
+      this.checkErrorRetype(() => {
+        axios.put(`${BACKEND_SERVER}/users`, { ...savedForm })
+          .then(res => {
+            if (res.status === 200) {
+              window.location.reload()
+            }
+          })
+          .catch(error => {
+            if (error.response) {
+              this.handleRequestFailed(error.response.data.messages)
+            } else if (error.request) {
+              this.handleRequestFailed('Can\'t connect to server!')
+            } else {
+              console.log('Error', error.message)
+            }
+            console.log(error.config)
+          })
+      })
+    })
   }
 
   handleDialogClose = () => {
@@ -237,21 +261,21 @@ class AdminViewUsers extends Component {
   }
 
   checkErrorRequired = (callback) => {
-    const { groupId } = this.state.savedForm
+    const { savedForm } = this.state
 
     this.setState({
       ...this.state,
       hasError: {
         ...this.state.hasError,
-        groupIdRequired: false
+        groupRequired: false
       }
     }, () => {
-      if (groupId === '0') {
+      if (savedForm.group === '') {
         this.setState({
           ...this.state,
           hasError: {
             ...this.state.hasError,
-            groupIdRequired: true
+            groupRequired: true
           }
         })
       } else {
@@ -322,20 +346,26 @@ class AdminViewUsers extends Component {
     })
   }
 
-  renderAddDialog = (classes) => {
+  renderFormDialog = (classes) => {
+    const { savedForm, dialog } = this.state
+
     return (
       <Dialog
           open={true}
           onClose={this.handleDialogClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Add New User</DialogTitle>
+          <DialogTitle id="form-dialog-title">
+            {dialog.key === 'add' ? 'Add New User' : 'Edit User'}
+          </DialogTitle>
           <DialogContent>
             <form className={classes.form} onSubmit={this.handleOnSubmit}>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="username">Username</InputLabel>
-                <Input id="username" name="username" autoComplete="username" autoFocus
-                  onChange={this.handleOnChange} />
+                <InputLabel htmlFor="nrp">NRP</InputLabel>
+                <Input id="nrp" name="nrp" autoComplete="nrp" autoFocus
+                  onChange={this.handleOnChange}
+                  value={savedForm.nrp}
+                  disabled={dialog.key !== 'add'} />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="password">Password</InputLabel>
@@ -348,24 +378,24 @@ class AdminViewUsers extends Component {
                   onChange={this.handleOnChange} />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="groupId">Group</InputLabel>
+                <InputLabel htmlFor="group">Group</InputLabel>
                 <Select
-                  value={this.state.savedForm.groupId}
+                  value={savedForm.group}
                   onChange={this.handleOnChange}
-                  name="groupId"
+                  name="group"
                   inputProps={{
-                    id: 'groupId',
+                    id: 'group',
                   }}
                   className={classes.selectEmpty}
                 >
-                  <MenuItem value={'0'}>
+                  <MenuItem value={''}>
                     <em>None</em>
                   </MenuItem>
                   {
-                    this.state.groups.map(group => <MenuItem key={group.id} value={group.id.toString(10)}>{group.name}</MenuItem>)
+                    this.state.groups.map(group => <MenuItem key={group.id} value={group.group_name}>{group.group_name}</MenuItem>)
                   }
                 </Select>
-                {this.state.hasError.groupIdRequired && <FormHelperText>Required</FormHelperText>}
+                {this.state.hasError.groupRequired && <FormHelperText>Required</FormHelperText>}
               </FormControl>
             </form>
           </DialogContent>
@@ -373,17 +403,22 @@ class AdminViewUsers extends Component {
             <Button onClick={this.handleDialogClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={this.handleAddSubmit} color="primary">
-              Add
-            </Button>
+            {
+              dialog.key === 'add' ?
+                <Button onClick={this.handleAddSubmit} color="primary">
+                  Add
+                </Button> :
+                <Button onClick={this.handleEditSubmit} color="primary">
+                  Save Changes
+                </Button>
+            }
           </DialogActions>
         </Dialog>
     )
   }
 
   renderDeleteDialog = () => {
-    const { groups, savedForm } = this.state
-    const group = groups.find(group => group.id.toString(10) === savedForm.groupId)
+    const { savedForm } = this.state
 
     return (
       <Dialog
@@ -394,7 +429,7 @@ class AdminViewUsers extends Component {
           <DialogTitle id="form-dialog-title">Delete User?</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              User named '{savedForm.username}' at group '{group.name}' will be deleted. Are you sure?
+              User '{savedForm.nrp}' will be deleted. Are you sure?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -409,76 +444,14 @@ class AdminViewUsers extends Component {
     )
   }
 
-  renderEditDialog = (classes) => {
-    const { savedForm } = this.state
-
-    return (
-      <Dialog
-          open={true}
-          onClose={this.handleDialogClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Edit User</DialogTitle>
-          <DialogContent>
-          <form className={classes.form} onSubmit={this.handleOnSubmit}>
-              <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="username">Username</InputLabel>
-                <Input id="username" name="username" autoComplete="username" autoFocus
-                  value={savedForm.username}
-                  onChange={this.handleOnChange} />
-              </FormControl>
-              <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="password">Password</InputLabel>
-                <Input name="password" type="password" id="password" autoComplete="password"
-                  onChange={this.handleOnChange} />
-              </FormControl>
-              <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="retype">Re-type Password</InputLabel>
-                <Input name="retype" type="password" id="retype" autoComplete="retype"
-                  onChange={this.handleOnChange} />
-              </FormControl>
-              <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="groupId">Group</InputLabel>
-                <Select
-                  value={savedForm.groupId}
-                  onChange={this.handleOnChange}
-                  name="groupId"
-                  inputProps={{
-                    id: 'groupId',
-                  }}
-                  className={classes.selectEmpty}
-                >
-                  <MenuItem value={'0'}>
-                    <em>None</em>
-                  </MenuItem>
-                  {
-                    this.state.groups.map(group => <MenuItem key={group.id} value={group.id.toString(10)}>{group.name}</MenuItem>)
-                  }
-                </Select>
-                {this.state.hasError.groupIdRequired && <FormHelperText>Required</FormHelperText>}
-              </FormControl>
-            </form>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleDialogClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handleEditSubmit} color="primary" disabled>
-              Save Changes
-            </Button>
-          </DialogActions>
-        </Dialog>
-    )
-  }
-
   renderDialog = (classes) => {
     const { key } = this.state.dialog
 
     switch (key) {
       case 'add':
-        return this.renderAddDialog(classes)
+        return this.renderFormDialog(classes)
       case 'edit':
-        return this.renderEditDialog(classes)
+        return this.renderFormDialog(classes)
       case 'delete':
         return this.renderDeleteDialog()
       default:
@@ -536,8 +509,8 @@ class AdminViewUsers extends Component {
                     <TableCell component="th" scope="row">
                       {user.id}
                     </TableCell>
-                    <TableCell align="left">{user.username}</TableCell>
-                    <TableCell align="left">{groups.find(group => group.id === user.groupId).name}</TableCell>
+                    <TableCell align="left">{user.nrp}</TableCell>
+                    <TableCell align="left">{groups.find(group => group.group_name === user.grup_id).group_name}</TableCell>
                     <TableCell align="left">
                       <EditIcon onClick={() => this.handleEditClick(user.id)} />
                       <DeleteIcon onClick={() => this.handleDeleteClick(user.id)} />
