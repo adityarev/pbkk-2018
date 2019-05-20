@@ -33,13 +33,13 @@ class Home extends Component {
       ...this.state,
       shouldRedirect: true
     }, () => {
-      cookies.remove('username')
+      cookies.remove('nrp')
       cookies.remove('gate')
     })
   }
 
   renderRedirect() {
-    return (this.state.shouldRedirect || !cookies.get('username')) && <Redirect push to="/login" />
+    return (this.state.shouldRedirect || !cookies.get('nrp')) && <Redirect push to="/login" />
   }
   
   render() {
@@ -55,7 +55,7 @@ class Home extends Component {
               <HomeRounded />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Hi, {cookies.get('username')}. Welcome to {cookies.get('gate')}!
+              Hi, {cookies.get('nrp')}. Welcome to {cookies.get('gate')}!
             </Typography>
             <Button
               fullWidth

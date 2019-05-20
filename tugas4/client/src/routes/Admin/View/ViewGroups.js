@@ -335,7 +335,7 @@ class AdminViewGroups extends Component {
 
   renderRedirect = () => {
     return false ||
-      (!cookies.get('username') && <Redirect push to="/login" />) ||
+      (!cookies.get('nrp') && <Redirect push to="/login" />) ||
       (this.state.redirect.isActive && <Redirect push to={this.state.redirect.link} />)
   }
 

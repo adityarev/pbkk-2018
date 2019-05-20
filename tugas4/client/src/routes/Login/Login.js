@@ -33,13 +33,13 @@ class Login extends Component {
 
     this.state = {
       hasError: {
-        gateIdRequired: false
+        gateRequired: false
       },
       gates: [],
       savedForm: {
-        username: '',
+        nrp: '',
         password: '',
-        gateId: 0
+        gate: ''
       },
       snackbar: {
         isActive: false,
@@ -54,10 +54,18 @@ class Login extends Component {
     axios.get(`${BACKEND_SERVER}/gates`, {})
       .then(res => {
         if (res.status === 200) {
-          this.setState({
-            ...this.state,
-            gates: res.data.result
-          })
+          const { error, message } = res.data
+
+          if (error === 0) {
+            this.setState({
+              ...this.state,
+              gates: message
+            }, () => {
+              console.log(message)
+            })
+          } else {
+            this.handleRequestFailed(message)
+          }
         }
       })
       .catch(error => {
@@ -73,7 +81,7 @@ class Login extends Component {
   }
 
   checkErrorRequired = (callback) => {
-    const { gateId } = this.state.savedForm
+    const { gate } = this.state.savedForm
 
     this.setState({
       ...this.state,
@@ -82,12 +90,12 @@ class Login extends Component {
         gateRequired: false
       }
     }, () => {
-      if (gateId === 0) {
+      if (gate === '') {
         this.setState({
           ...this.state,
           hasError: {
             ...this.state.hasError,
-            gateIdRequired: true
+            gateRequired: true
           }
         })
       } else {
@@ -111,15 +119,15 @@ class Login extends Component {
   handleOnSubmit = (event) => {
     event.preventDefault()
     this.checkErrorRequired(() => {
-      if (!this.state.hasError.gateIdRequired) {
+      if (!this.state.hasError.gateRequired) {
         const { savedForm, gates } = this.state
         axios.post(`${BACKEND_SERVER}/auth/login`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
-              const { username } = savedForm
-              const gateName = gates.find(gate => gate.id === savedForm.gateId).name
+              const { nrp } = savedForm
+              const gateName = gates.find(gate => gate.id === savedForm.gate).name
 
-              this.handleLoginSuccess(username, gateName)
+              this.handleLoginSuccess(nrp, gateName)
             }
           })
           .catch(error => {
@@ -136,12 +144,12 @@ class Login extends Component {
     })
   }
 
-  handleLoginSuccess = (username, gate) => {
+  handleLoginSuccess = (nrp, gate) => {
     this.setState({
       ...this.state,
       shouldRedirect: true
     }, () => {
-      cookies.set('username', username, { path: '/' })
+      cookies.set('nrp', nrp, { path: '/' })
       cookies.set('gate', gate, { path: '/' })
     })
   }
@@ -186,7 +194,7 @@ class Login extends Component {
 
     return (
       <Fragment>
-        {(cookies.get('username') || this.state.shouldRedirect) && this.renderRedirect()}
+        {(cookies.get('nrp') || this.state.shouldRedirect) && this.renderRedirect()}
         <main className={classes.main}>
           <CssBaseline />
           <Paper className={classes.paper}>
@@ -198,8 +206,8 @@ class Login extends Component {
             </Typography>
             <form className={classes.form} onSubmit={this.handleOnSubmit}>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="username">Username</InputLabel>
-                <Input id="username" name="username" autoComplete="username" autoFocus
+                <InputLabel htmlFor="nrp">NRP</InputLabel>
+                <Input id="nrp" name="nrp" autoComplete="nrp" autoFocus
                   onChange={this.handleOnChange} />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
@@ -208,24 +216,24 @@ class Login extends Component {
                   onChange={this.handleOnChange} />
               </FormControl>
               <FormControl margin="normal" required fullWidth>
-                <InputLabel htmlFor="gateId">Gate</InputLabel>
+                <InputLabel htmlFor="gate">Gate</InputLabel>
                 <Select
-                  value={this.state.savedForm.gateId}
+                  value={this.state.savedForm.gate}
                   onChange={this.handleOnChange}
-                  name="gateId"
+                  name="gate"
                   inputProps={{
-                    id: 'gateId',
+                    id: 'gate',
                   }}
                   className={classes.selectEmpty}
                 >
-                  <MenuItem value={0}>
+                  <MenuItem value={''}>
                     <em>None</em>
                   </MenuItem>
                   {
-                    this.state.gates.map(gate => <MenuItem key={gate.id} value={gate.id}>{gate.name}</MenuItem>)
+                    this.state.gates.map(gate => <MenuItem key={gate.id} value={gate.gate}>{gate.gate}</MenuItem>)
                   }
                 </Select>
-                {this.state.hasError.gateIdRequired && <FormHelperText>Required</FormHelperText>}
+                {this.state.hasError.gateRequired && <FormHelperText>Required</FormHelperText>}
               </FormControl>
               <Button
                   type="submit"

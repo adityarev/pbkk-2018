@@ -66,7 +66,7 @@ class AdminHome extends Component {
         link: '/login'
       }
     }, () => {
-      cookies.remove('username')
+      cookies.remove('nrp')
     })
   }
 
@@ -82,7 +82,7 @@ class AdminHome extends Component {
 
   renderRedirect() {
     return false ||
-      (!cookies.get('username') && <Redirect push to='/login' />) ||
+      (!cookies.get('nrp') && <Redirect push to='/login' />) ||
       (this.state.redirect.isActive && <Redirect push to={this.state.redirect.link} />)
   }
   
@@ -100,7 +100,7 @@ class AdminHome extends Component {
               <SupervisorAccountRounded />
             </Avatar>
             <Typography component="h1" variant="h5">
-              {/* Welcome, {cookies.get('username')}! */}
+              {/* Welcome, {cookies.get('nrp')}! */}
               Welcome, Admin!
             </Typography>
             <div className={classes.root}>
