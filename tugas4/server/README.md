@@ -1,5 +1,41 @@
 # API Documentation
 
+## Auth
+
+```json
+// sample request
+
+{
+    "username": "ronald",
+    "password": "ronald",
+    "gateId": 1
+}
+```
+
+```json
+// sample response
+
+{
+    "id": 1,
+    "userId": 1,
+    "gateId": 1,
+    "updatedAt": "2019-05-06T21:52:25.832Z",
+    "createdAt": "2019-05-06T21:52:25.832Z"
+}
+```
+
+### Login (`POST` `/login`)
+
+- Parameters:
+    - `username`: `STRING`
+    - `password`: `STRING`
+    - `gateId`: `INTEGER`
+- Returns:
+    - `{ "result": { log object for current login } }`
+- Errors:
+    - `400` - `{ "message": "[parameter] is required" }`
+    - `404` - `{ "message": "Not found" }` (Invalid credentials or gateId)
+
 ## Gate
 
 ```json
