@@ -49,11 +49,11 @@ class AdminHome extends Component {
           link: '/admin/groups',
           title: 'View Groups'
         },
-        {
-          img: 'https://cdn0.iconfinder.com/data/icons/business-finance-11/100/icon-35-512.png',
-          link: '/admin/rules',
-          title: 'View Rules'
-        }
+        // {
+        //   img: 'https://cdn0.iconfinder.com/data/icons/business-finance-11/100/icon-35-512.png',
+        //   link: '/admin/rules',
+        //   title: 'View Rules'
+        // }
       ]
     }
   }
