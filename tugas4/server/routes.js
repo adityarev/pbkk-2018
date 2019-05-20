@@ -8,7 +8,7 @@ import * as logs from './api/views/logs'
 
 export const initialize_endpoints = app => {
     
-    app.post('/auth/login', auth.login)
+    app.post('/login', auth.login)
 
     app.get('/gates', gates.all)
     app.post('/gates', gates.create)
