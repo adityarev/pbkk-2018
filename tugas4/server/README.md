@@ -53,7 +53,7 @@
 
 ### Gate List (`GET` `/gates`)
 
-- Query Parameters
+- Query Parameters:
 	- None
 - Returns:
 	- `{ "result": [ list of gate object ] }`
@@ -100,7 +100,7 @@
 
 ### Group List (`GET` `/groups`)
 
-- Query Parameters
+- Query Parameters:
 	- None
 - Returns:
 	- `{ "result": [ list of group object ] }`
@@ -149,7 +149,7 @@
 
 ### User List (`GET` `/users[?groupId=x]`)
 
-- Query Parameters
+- Query Parameters:
 	- `?groupId`: `INTEGER`
 - Returns:
 	- `{ "result": [ list of user object ] }`
@@ -201,7 +201,7 @@
 
 ### Rule List (`GET` `/rules[?open=x&close=x&gateId=x&groupId=x]`)
 
-- Query Parameters
+- Query Parameters:
 	- `?open`: `INTEGER`
 	- `?close`: `INTEGER`
 	- `?gateId`: `INTEGER`
@@ -255,7 +255,7 @@
 
 ### Log List (`GET` `/logs[?userId=x&gateId=x]`)
 
-- Query Parameters
+- Query Parameters:
 	- `?userId`: `INTEGER`
 	- `?gateId`: `INTEGER`
 - Returns:
