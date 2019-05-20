@@ -11,7 +11,7 @@
 }
 ```
 
-### Gate List (`GET` `/api/gates`)
+### Gate List (`GET` `/gates`)
 
 - Query Parameters
 	- None
@@ -20,7 +20,7 @@
 - Errors:
 	- `{ "message": "error message"  }`
 
-### Create Gate (`POST` `/api/gates`)
+### Create Gate (`POST` `/gates`)
 
 - Parameters:
 	- `name`: `STRING`
@@ -29,7 +29,7 @@
 - Errors:
 	- `{ "message": [ list of error messages ] }`
 
-### Gate Details (`GET` `/api/gates/:id`)
+### Gate Details (`GET` `/gates/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -38,7 +38,7 @@
 - Errors:
 	- `404` - `{ "message": "Not found" }`
 
-### Delete Gate (`DELETE` `/api/gates/:id`)
+### Delete Gate (`DELETE` `/gates/:id`)
 
 - Parameters:
 	- `:id`: `INTEGER`
@@ -58,7 +58,7 @@
 }
 ```
 
-### Group List (`GET` `/api/groups`)
+### Group List (`GET` `/groups`)
 
 - Query Parameters
 	- None
@@ -67,7 +67,7 @@
 - Errors:
 	- `{ "message": "error message"  }`
 
-### Create Group (`POST` `/api/groups`)
+### Create Group (`POST` `/groups`)
 
 - Parameters:
 	- `name`: `STRING`
@@ -76,7 +76,7 @@
 - Errors:
 	- `{ "message": [ list of error messages ] }`
 
-### Group Details (`GET` `/api/groups/:id`)
+### Group Details (`GET` `/groups/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -85,7 +85,7 @@
 - Errors:
 	- `404` - `{ "message": "Not found" }`
 
-### Delete Group (`DELETE` `/api/groups/:id`)
+### Delete Group (`DELETE` `/groups/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -107,7 +107,7 @@
 }
 ```
 
-### User List (`GET` `/api/users[?groupId=x]`)
+### User List (`GET` `/users[?groupId=x]`)
 
 - Query Parameters
 	- `?groupId`: `INTEGER`
@@ -116,7 +116,7 @@
 - Errors:
 	- `{ "message": "error message"  }`
 
-### Create User (`POST` `/api/users`)
+### Create User (`POST` `/users`)
 
 - Parameters:
 	- `username`: `STRING`
@@ -127,7 +127,7 @@
 - Errors:
 	- `{ "message": [ list of error messages ] }`
 
-### User Details (`GET` `/api/users/:id`)
+### User Details (`GET` `/users/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -136,7 +136,7 @@
 - Errors:
 	- `404` - `{ "message": "Not found" }`
 
-### Delete User (`DELETE` `/api/users/:id`)
+### Delete User (`DELETE` `/users/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -159,7 +159,7 @@
 }
 ```
 
-### Rule List (`GET` `/api/rules[?open=x&close=x&gateId=x&groupId=x]`)
+### Rule List (`GET` `/rules[?open=x&close=x&gateId=x&groupId=x]`)
 
 - Query Parameters
 	- `?open`: `INTEGER`
@@ -171,7 +171,7 @@
 - Errors:
 	- `{ "message": "error message"  }`
 
-### Create Rule (`POST` `/api/rules`)
+### Create Rule (`POST` `/rules`)
 
 - Parameters:
 	- `open`: `INTEGER`
@@ -183,7 +183,7 @@
 - Errors:
 	- `{ "message": [ list of error messages ] }`
 
-### Rule Details (`GET` `/api/rules/:id`)
+### Rule Details (`GET` `/rules/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -192,7 +192,7 @@
 - Errors:
 	- `404` - `{ "message": "Not found" }`
 
-### Delete Rule (`DELETE` `/api/rules/:id`)
+### Delete Rule (`DELETE` `/rules/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -213,7 +213,7 @@
 }
 ```
 
-### Log List (`GET` `/api/logs[?userId=x&gateId=x]`)
+### Log List (`GET` `/logs[?userId=x&gateId=x]`)
 
 - Query Parameters
 	- `?userId`: `INTEGER`
@@ -223,7 +223,7 @@
 - Errors:
 	- `{ "message": "error message"  }`
 
-### Create Log (`POST` `/api/logs`)
+### Create Log (`POST` `/logs`)
 
 - Parameters:
 	- `userId`: `INTEGER`
@@ -233,7 +233,7 @@
 - Errors:
 	- `{ "message": [ list of error messages ] }`
 
-### Log Details (`GET` `/api/logs/:id`)
+### Log Details (`GET` `/logs/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`
@@ -242,7 +242,7 @@
 - Errors:
 	- `404` - `{ "message": "Not found" }`
 
-### Delete Log (`DELETE` `/api/logs/:id`)
+### Delete Log (`DELETE` `/logs/:id`)
 
 - Path Parameters:
 	- `:id`: `INTEGER`

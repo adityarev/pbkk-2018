@@ -63,7 +63,7 @@ class AdminViewGates extends Component {
   }
 
   componentDidMount() {
-    axios.get(`${BACKEND_SERVER}/api/gates`, {})
+    axios.get(`${BACKEND_SERVER}/gates`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
@@ -96,7 +96,7 @@ class AdminViewGates extends Component {
 
   handleAddSubmit = () => {
     const { savedForm } = this.state
-    axios.post(`${BACKEND_SERVER}/api/gates`, { name: savedForm.gateName })
+    axios.post(`${BACKEND_SERVER}/gates`, { name: savedForm.gateName })
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -133,7 +133,7 @@ class AdminViewGates extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`${BACKEND_SERVER}/api/gates/${savedForm.gateId}`, {})
+    axios.delete(`${BACKEND_SERVER}/gates/${savedForm.gateId}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()

@@ -77,14 +77,14 @@ class AdminViewUsers extends Component {
   }
 
   componentDidMount() {
-    axios.get(`${BACKEND_SERVER}/api/users`, {})
+    axios.get(`${BACKEND_SERVER}/users`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
             ...this.state,
             users: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
           }, () => {
-            axios.get(`${BACKEND_SERVER}/api/groups`, {})
+            axios.get(`${BACKEND_SERVER}/groups`, {})
               .then(res => {
                 if (res.status === 200) {
                   this.setState({
@@ -140,7 +140,7 @@ class AdminViewUsers extends Component {
 
     this.checkErrorRequired(() => {
       this.checkErrorRetype(() => {
-        axios.post(`${BACKEND_SERVER}/api/users`, { ...savedForm })
+        axios.post(`${BACKEND_SERVER}/users`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
               window.location.reload()
@@ -183,7 +183,7 @@ class AdminViewUsers extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`${BACKEND_SERVER}/api/users/${savedForm.userId}`, {})
+    axios.delete(`${BACKEND_SERVER}/users/${savedForm.userId}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
