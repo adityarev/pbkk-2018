@@ -1,1 +1,1 @@
-export const BACKEND_SERVER = 'http://localhost:5000'
+export const BACKEND_SERVER = 'http://e9e64c42.ngrok.io'
