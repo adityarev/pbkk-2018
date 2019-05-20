@@ -37,8 +37,11 @@
 - Returns:
     - `{ "result": { log object for current login } }`
 - Errors:
-    - `400` - `{ "message": "[parameter] is required" }`
-    - `404` - `{ "message": "Not found" }` (Invalid credentials or gateId)
+    - `{ "message": "[parameter] is required" }` (missing parameters)
+    - `{ "message": "Invalid credentials" }` (invalid username and/or password)
+    - `{ "message": "Invalid gateId" }` (gateId does not exist)
+    - `{ "message": "Group [group name] does not have rules for gate [gate name]..." }` (self-explanatory)
+    - `{ "message": "Group [group name] are not allowed to access [gate name] at this hours` (self-explanatory)
 
 ## Gate
 
