@@ -60,8 +60,6 @@ class Login extends Component {
             this.setState({
               ...this.state,
               gates: message
-            }, () => {
-              console.log(message)
             })
           } else {
             this.handleRequestFailed(message)
@@ -120,19 +118,17 @@ class Login extends Component {
     event.preventDefault()
     this.checkErrorRequired(() => {
       if (!this.state.hasError.gateRequired) {
-        const { savedForm, gates } = this.state
-        axios.post(`${BACKEND_SERVER}/auth/login`, { ...savedForm })
+        const { savedForm } = this.state
+        axios.post(`${BACKEND_SERVER}/login`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
-              const { nrp } = savedForm
-              const gateName = gates.find(gate => gate.id === savedForm.gate).name
-
-              this.handleLoginSuccess(nrp, gateName)
+              const { nrp, gate } = savedForm
+              this.handleLoginSuccess(nrp, gate)
             }
           })
           .catch(error => {
             if (error.response) {
-              this.handleRequestFailed(error.response.data.messages)
+              this.handleRequestFailed(error.response.data.message)
             } else if (error.request) {
               this.handleRequestFailed('Can\'t connect to server!')
             } else {
