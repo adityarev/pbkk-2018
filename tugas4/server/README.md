@@ -1,3 +1,7 @@
+# Database Schema
+
+![db_schema](imgs/schema.png)
+
 # API Documentation
 
 ## Auth
