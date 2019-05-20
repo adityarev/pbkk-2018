@@ -3,6 +3,10 @@ const AdminViewGatesStyledComponent = theme => ({
     margin: theme.spacing.unit,
     backgroundColor: theme.palette.secondary.main,
   },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
   extendedIcon: {
     marginRight: theme.spacing.unit,
   },
@@ -36,6 +40,9 @@ const AdminViewGatesStyledComponent = theme => ({
     marginTop: theme.spacing.unit * 3,
   },
   table: {},
+  textField: {
+    width: '100%',
+  },
 })
 
 export default AdminViewGatesStyledComponent

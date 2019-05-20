@@ -25,6 +25,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 
 import { BACKEND_SERVER } from '../../../constants/constants'
 import { Redirect } from 'react-router-dom'
+import { formTimeFormat, pickerTimeFormat, tableTimeFormat } from '../../../util/formatter'
 import axios from 'axios'
 import Cookies from 'universal-cookie'
 import AdminViewGatesStyledComponent from '../../../styledComponents/adminViewGates'
@@ -51,8 +52,10 @@ class AdminViewGates extends Component {
         key: ''
       },
       savedForm: {
-        gateId: '',
-        gateName: '',
+        id: '',
+        gate: '',
+        open: '',
+        close: '',
       },
       snackbar: {
         isActive: false,
@@ -68,7 +71,7 @@ class AdminViewGates extends Component {
         if (res.status === 200) {
           this.setState({
             ...this.state,
-            gates: res.data.result.sort((a, b) => (a.id < b.id ? -1 : 1))
+            gates: res.data.message.sort((a, b) => (a.id < b.id ? -1 : 1))
           })
         }
       })
@@ -87,6 +90,12 @@ class AdminViewGates extends Component {
   handleAddClick = () => {
     this.setState({
       ...this.state,
+      savedForm: {
+        id: '',
+        gate: '',
+        open: '2019-01-01 00:00',
+        close: '2019-01-01 00:00',
+      },
       dialog: {
         isActive: true,
         key: 'add'
@@ -96,7 +105,8 @@ class AdminViewGates extends Component {
 
   handleAddSubmit = () => {
     const { savedForm } = this.state
-    axios.post(`${BACKEND_SERVER}/gates`, { name: savedForm.gateName })
+
+    axios.post(`${BACKEND_SERVER}/gates`, { ...savedForm })
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -104,7 +114,7 @@ class AdminViewGates extends Component {
       })
       .catch(error => {
         if (error.response) {
-          this.handleRequestFailed(error.response.data.messages)
+          this.handleRequestFailed(error.response.data.message)
         } else if (error.request) {
           this.handleRequestFailed('Can\'t connect to server!')
         } else {
@@ -114,15 +124,15 @@ class AdminViewGates extends Component {
       })
   }
 
-  handleDeleteClick = (gateId) => {
+  handleDeleteClick = (id) => {
     const { gates } = this.state
-
+    const gate = gates.find(gate => gate.id === id)
+    
     this.setState({
       ...this.state,
       savedForm: {
         ...this.state.savedForm,
-        gateId: gateId.toString(10),
-        gateName: gates.find(gate => gate.id === gateId).name
+        gate: gate.gate
       },
       dialog: {
         isActive: true,
@@ -133,7 +143,8 @@ class AdminViewGates extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`${BACKEND_SERVER}/gates/${savedForm.gateId}`, {})
+
+    axios.delete(`${BACKEND_SERVER}/gates/${savedForm.gate}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -141,7 +152,7 @@ class AdminViewGates extends Component {
       })
       .catch(error => {
         if (error.response) {
-          this.handleRequestFailed(error.response.data.messages)
+          this.handleRequestFailed(error.response.data.message)
         } else if (error.request) {
           this.handleRequestFailed('Can\'t connect to server!')
         } else {
@@ -151,15 +162,18 @@ class AdminViewGates extends Component {
       })
   }
 
-  handleEditClick = (gateId) => {
+  handleEditClick = (id) => {
     const { gates } = this.state
+    const gate = gates.find(gate => gate.id === id)
 
     this.setState({
       ...this.state,
       savedForm: {
         ...this.state.savedForm,
-        gateId: gateId.toString(10),
-        gateName: gates.find(gate => gate.id === gateId).name
+        id: id,
+        gate: gate.gate,
+        open: formTimeFormat(gate.open),
+        close: formTimeFormat(gate.close),
       },
       dialog: {
         isActive: true,
@@ -169,15 +183,38 @@ class AdminViewGates extends Component {
   }
 
   handleEditSubmit = () => {
-    console.log('Submitting edit form ...')
+    const { savedForm } = this.state
+
+    axios.put(`${BACKEND_SERVER}/gates`, { ...savedForm })
+      .then(res => {
+        if (res.status === 200) {
+          window.location.reload()
+        }
+      })
+      .catch(error => {
+        if (error.response) {
+          this.handleRequestFailed(error.response.data.message)
+        } else if (error.request) {
+          this.handleRequestFailed('Can\'t connect to server!')
+        } else {
+          console.log('Error', error.message)
+        }
+        console.log(error.config)
+      })
   }
 
   handleDialogClose = () => {
     this.setState({
       ...this.state,
+      savedForm: {
+        id: '',
+        gate: '',
+        open: '2019-01-01 00:00',
+        close: '2019-01-01 00:00',
+      },
       dialog: {
-        ...this.state.dialog,
-        isActive: false
+        isActive: false,
+        key: ''
       }
     })
   }
@@ -194,13 +231,16 @@ class AdminViewGates extends Component {
   
   handleOnChange = (event) => {
     const { name, value } = event.target
+    console.log(value)
 
     this.setState({
       ...this.state,
       savedForm: {
         ...this.state.savedForm,
-        [name]: value
+        [name]: (name === 'open' || name === 'close') ? formTimeFormat(value) : value
       }
+    }, () => {
+      console.log(this.state.savedForm)
     })
   }
 
@@ -226,40 +266,79 @@ class AdminViewGates extends Component {
     })
   }
 
-  renderAddDialog = () => {
+  renderFormDialog = () => {
+    const { classes } = this.props
+    const { savedForm, dialog } = this.state
+
     return (
       <Dialog
           open={true}
           onClose={this.handleDialogClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Add New Gate</DialogTitle>
+          <DialogTitle id="form-dialog-title">
+            {dialog.key === 'add' ? 'Add New Gate' : 'Edit Gate'}
+          </DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
               margin="dense"
-              id="gateName"
-              name="gateName"
-              label="Gate Name"
+              id="gate"
+              name="gate"
+              label="Gate"
               type="text"
               fullWidth
               onChange={this.handleOnChange}
+              value={savedForm.gate}
+              disabled={dialog.key !== 'add'}
             />
+            <form className={classes.container} noValidate>
+              <TextField
+                id="open"
+                name="open"
+                label="Open"
+                type="datetime-local"
+                defaultValue={pickerTimeFormat(savedForm.open)}
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                onChange={this.handleOnChange}
+              />
+              <TextField
+                id="close"
+                name="close"
+                label="Close"
+                type="datetime-local"
+                defaultValue={pickerTimeFormat(savedForm.close)}
+                className={classes.textField}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                onChange={this.handleOnChange}
+              />
+            </form>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.handleDialogClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={this.handleAddSubmit} color="primary">
-              Add
-            </Button>
+            {
+              dialog.key === 'add' ?
+                <Button onClick={this.handleAddSubmit} color="primary">
+                  Add
+                </Button> :
+                <Button onClick={this.handleEditSubmit} color="primary">
+                  Save Changes
+                </Button>
+            }
           </DialogActions>
         </Dialog>
     )
   }
 
   renderDeleteDialog = () => {
-    const { gateName } = this.state.savedForm
+    const { savedForm } = this.state
 
     return (
       <Dialog
@@ -270,7 +349,7 @@ class AdminViewGates extends Component {
           <DialogTitle id="form-dialog-title">Delete Gate?</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Gate named '{gateName}' will be deleted. Are you sure?
+              Gate '{savedForm.gate}' will be deleted. Are you sure?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -285,47 +364,14 @@ class AdminViewGates extends Component {
     )
   }
 
-  renderEditDialog = () => {
-    return (
-      <Dialog
-          open={true}
-          onClose={this.handleDialogClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Edit Gate</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="gateName"
-              name="gateName"
-              label="Gate Name"
-              type="text"
-              fullWidth
-              onChange={this.handleOnChange}
-              value={this.state.savedForm.gateName}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleDialogClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handleEditSubmit} color="primary" disabled>
-              Save Changes
-            </Button>
-          </DialogActions>
-        </Dialog>
-    )
-  }
-
   renderDialog = () => {
     const { key } = this.state.dialog
 
     switch (key) {
       case 'add':
-        return this.renderAddDialog()
+        return this.renderFormDialog()
       case 'edit':
-        return this.renderEditDialog()
+        return this.renderFormDialog()
       case 'delete':
         return this.renderDeleteDialog()
       default:
@@ -368,7 +414,9 @@ class AdminViewGates extends Component {
               <TableHead>
                 <TableRow>
                   <TableCell>ID</TableCell>
-                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="left">Gate</TableCell>
+                  <TableCell align="left">Open</TableCell>
+                  <TableCell align="left">Close</TableCell>
                   <TableCell align="left">Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -378,7 +426,9 @@ class AdminViewGates extends Component {
                     <TableCell component="th" scope="row">
                       {gate.id}
                     </TableCell>
-                    <TableCell align="left">{gate.name}</TableCell>
+                    <TableCell align="left">{gate.gate}</TableCell>
+                    <TableCell align="left">{tableTimeFormat(gate.open)}</TableCell>
+                    <TableCell align="left">{tableTimeFormat(gate.close)}</TableCell>
                     <TableCell align="left">
                       <EditIcon onClick={() => this.handleEditClick(gate.id)} />
                       <DeleteIcon onClick={() => this.handleDeleteClick(gate.id)} />
