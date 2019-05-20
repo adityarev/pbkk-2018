@@ -51,7 +51,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    axios.get(`${BACKEND_SERVER}/api/gates`, {})
+    axios.get(`${BACKEND_SERVER}/gates`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
@@ -113,7 +113,7 @@ class Login extends Component {
     this.checkErrorRequired(() => {
       if (!this.state.hasError.gateIdRequired) {
         const { savedForm, gates } = this.state
-        axios.post(`${BACKEND_SERVER}/api/auth/login`, { ...savedForm })
+        axios.post(`${BACKEND_SERVER}/auth/login`, { ...savedForm })
           .then(res => {
             if (res.status === 200) {
               const { username } = savedForm

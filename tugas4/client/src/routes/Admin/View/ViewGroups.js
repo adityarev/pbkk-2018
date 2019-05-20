@@ -63,7 +63,7 @@ class AdminViewGroups extends Component {
   }
 
   componentDidMount() {
-    axios.get(`${BACKEND_SERVER}/api/groups`, {})
+    axios.get(`${BACKEND_SERVER}/groups`, {})
       .then(res => {
         if (res.status === 200) {
           this.setState({
@@ -96,7 +96,7 @@ class AdminViewGroups extends Component {
 
   handleAddSubmit = () => {
     const { savedForm } = this.state
-    axios.post(`${BACKEND_SERVER}/api/groups`, { name: savedForm.groupName })
+    axios.post(`${BACKEND_SERVER}/groups`, { name: savedForm.groupName })
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
@@ -133,7 +133,7 @@ class AdminViewGroups extends Component {
 
   handleDeleteSubmit = () => {
     const { savedForm } = this.state
-    axios.delete(`${BACKEND_SERVER}/api/groups/${savedForm.groupId}`, {})
+    axios.delete(`${BACKEND_SERVER}/groups/${savedForm.groupId}`, {})
       .then(res => {
         if (res.status === 200) {
           window.location.reload()
