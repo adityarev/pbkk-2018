@@ -4,7 +4,7 @@ import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import FormControl from '@material-ui/core/FormControl'
-import FormHelperText from '@material-ui/core/FormHelperText';
+// import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined'
@@ -13,14 +13,14 @@ import Paper from '@material-ui/core/Paper'
 import Select from '@material-ui/core/Select';
 import Typography from '@material-ui/core/Typography'
 import withStyles from '@material-ui/core/styles/withStyles'
-import StyledComponent from '../../styledComponents/base'
-import SnackbarContent from '../../components/Snackbar/SnackbarContent'
-import SnackbarPopUp from '../../components/Snackbar/SnackbarPopUp'
 
 import { Offline, Detector } from 'react-detect-offline'
-import axios from 'axios'
 import { Redirect } from 'react-router-dom'
+import axios from 'axios'
 import Cookies from 'universal-cookie'
+import LoginStyledComponent from '../../styledComponents/login'
+import SnackbarContent from '../../components/Snackbar/SnackbarContent'
+import SnackbarPopUp from '../../components/Snackbar/SnackbarPopUp'
 
 const cookies = new Cookies()
 
@@ -152,13 +152,15 @@ class Login extends Component {
                 <InputLabel htmlFor="username">Username</InputLabel>
                 <Input id="username" name="username" autoComplete="username" autoFocus
                   onChange={this.handleOnChange} />
+                {/* <FormHelperText>Required</FormHelperText> */}
               </FormControl>
               <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="password">Password</InputLabel>
                 <Input name="password" type="password" id="password" autoComplete="current-password"
                   onChange={this.handleOnChange} />
+                {/* <FormHelperText>Required</FormHelperText> */}
               </FormControl>
-              <FormControl required className={classes.formControl}>
+              <FormControl margin="normal" required fullWidth>
                 <InputLabel htmlFor="gate-required">Gate</InputLabel>
                 <Select
                   value={this.state.savedForm.gate}
@@ -176,7 +178,7 @@ class Login extends Component {
                   <MenuItem value={"2"}>Gate 2</MenuItem>
                   <MenuItem value={"3"}>Gate 3</MenuItem>
                 </Select>
-                <FormHelperText>Required</FormHelperText>
+                {/* <FormHelperText>Required</FormHelperText> */}
               </FormControl>
               <Detector
                 render={({ online }) => (
@@ -201,4 +203,4 @@ class Login extends Component {
   }
 }
 
-export default withStyles(StyledComponent)(Login)
+export default withStyles(LoginStyledComponent)(Login)
